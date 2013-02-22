@@ -11,5 +11,9 @@ class Site
         if ('518' == $info->from) {
             return Site518::findCompanyByInfo($info);
         }
+
+        if ('1111' == $info->from) {
+            return Site1111::findCompanyByInfo($info);
+        }
     }
 }
