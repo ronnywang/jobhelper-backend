@@ -34,4 +34,13 @@ class IndexController extends Pix_Controller
 
         return $this->json($ret);
     }
+
+    public function showAction()
+    {
+        list(, /*index*/, /*show*/, $id) = explode('/', $this->getURI());
+
+        $this->view->no = intval($id);
+        return $this->redraw('/index/company.phtml');
+
+    }
 }
