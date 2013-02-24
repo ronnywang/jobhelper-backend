@@ -20,6 +20,11 @@ class CompanyService
         return $data;
     }
 
+    public static function getCompanyInfoById($id)
+    {
+        return self::http('http://company.g0v.ronny.tw/api/show/' . intval($id))->data;
+    }
+
     public static function getCompanyByName($name)
     {
         $result = self::http('http://company.g0v.ronny.tw/api/search?q=' . urlencode($name) . '&alive_only=1');
