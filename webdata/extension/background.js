@@ -18,7 +18,7 @@ var popup_function = function(params){
     var info_dom = document.getElementById('CompanyInfo');
     info_dom.style.background = ('undefined' === typeof(params.bgcolor)) ? 'yellow' : params.bgcolor;
     info_dom.style.color = ('undefined' === typeof(params.fgcolor)) ? 'black' : params.fgcolor;
-    document.getElementById('CompanyInfoMessage').innerText = params.body;
+    document.getElementById('CompanyInfoMessage').innerHTML = params.body;
 };
 
 function onRequest(request, sender, sendResponse) {
