@@ -27,9 +27,9 @@ class IndexController extends Pix_Controller
         $ret->error = false;
         $id = Site::findCompanyByInfo($info);
         if ($id) {
-            $ret->body = '<b>' . $info->name . '(' . $id . ')' . '</b>';
+            $ret->body = $this->view->partial('/index/company.phtml', array('no' => $id, 'name' => $info->name));
         } else {
-            $ret->body = '<b>' . json_encode($info, JSON_UNESCAPED_UNICODE) . '</b>';
+            $ret->body = '找不到這家公司資料';
         }
 
         return $this->json($ret);

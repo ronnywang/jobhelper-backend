@@ -1,0 +1,5 @@
+<h4><?= $this->escape($this->name) ?>(<?= $this->escape($this->no) ?>)</h4>
+<?php foreach (CompanyEvent::search(array('company_no' => $this->no)) as $event) { ?>
+<?php if ($event->type == 1) { ?>
+<?php } ?>
+<?php } ?>
