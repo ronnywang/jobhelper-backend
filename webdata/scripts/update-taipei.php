@@ -43,6 +43,6 @@ foreach ($table_dom->getElementsByTagName('tr') as $tr_dom) {
         'time' => $time,
         'from' => 'http://www.bola.taipei.gov.tw/ct.asp?xItem=41223990&ctNode=62846&mp=116003',
         'snapshot' => '',
-        'message' => "於 {$date} 違反 {$violation}, 文號: {$number}",
+        'message' => "違反 {$violation}, 文號: {$number}",
     ));
 }
