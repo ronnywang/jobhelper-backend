@@ -1,1 +1,14 @@
-Hello World
+<ol>
+    <?php foreach (CompanyEvent::search(1) as $event) { ?>
+    <?php $company_info = CompanyInfo::get($event->company_no); ?>
+    <li>
+    <?= date('Y/m/d', $event->time) ?>. <a href="http://company.g0v.ronny.tw/id/<?= $event->company_no ?>" target="_blank"><?= $this->escape($company_info->{'公司名稱'}) ?></a> <?= $this->escape($event->message) ?>
+    <?php if ($event->from) { ?>
+    [<a href="<?= $this->escape($event->from) ?>" target="_blank">來源</a>]
+    <?php } ?>
+    <?php if ($eent->snapshot) { ?>
+    [<a href="<?= $this->escape($event->snapshot) ?>" target="_blank">截圖</a>]
+    <?php } ?>
+    </li>
+    <?php } ?>
+</ol>
