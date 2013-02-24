@@ -1,10 +1,14 @@
 <h4><?= $this->escape($this->name) ?>(<?= $this->escape($this->no) ?>)</h4>
-<?php foreach (CompanyEvent::search(array('company_no' => $this->no)) as $event) { ?>
-<?php if ($event->type == 1) { ?>
-<?php $data = json_decode($event->data) ?>
-違反法令條款: <?= $this->escape($data->{'違反法令條款'}) ?><br>
-處分書文號: <?= $this->escape($data->{'處分書文號'}) ?><br>
-處分日期: <?= $this->escape($data->{'處分日期'}) ?><br>
-<hr>
-<?php } ?>
-<?php } ?>
+<ol>
+    <?php foreach (CompanyEvent::search(array('company_no' => $this->no)) as $event) { ?>
+    <li>
+    <?= date('Y/m/d', $event->time) ?>. <?= $this->escape($event->message) ?>
+    <?php if ($event->from) { ?>
+    [<a href="<?= $this->escape($event->from) ?>" target="_blank">來源</a>]
+    <?php } ?>
+    <?php if ($eent->snapshot) { ?>
+    [<a href="<?= $this->escape($event->snapshot) ?>" target="_blank">截圖</a>]
+    <?php } ?>
+    </li>
+    <?php } ?>
+</ol>
