@@ -1,4 +1,5 @@
 <h4><?= $this->escape($this->name) ?>(<?= $this->escape($this->no) ?>)</h4>
+<?php if (count(CompanyEvent::search(array('company_no' => $this->no)))) { ?>
 <ol>
     <?php foreach (CompanyEvent::search(array('company_no' => $this->no)) as $event) { ?>
     <li>
@@ -12,3 +13,6 @@
     </li>
     <?php } ?>
 </ol>
+<?php } else { ?>
+目前無此公司相關訊息，可以按 <a href="http://jobinfo.g0v.ronny.tw/?no=<?= $this->escape($this->no) ?>">這理</a> 回報資訊
+<?php } ?>
