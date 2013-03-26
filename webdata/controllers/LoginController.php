@@ -38,7 +38,7 @@ class LoginController extends Pix_Controller
         if (!$member = TeamMember::search(array('user_name' => 'google://' . $email))->first()) {
             return $this->alert('您不在管理名單中', '/');
         }
-        Pix_Session::set('login_id', $member->id);
+        Pix_Session::set('member_id', $member->user_id);
         return $this->redirect('/');
     }
 
