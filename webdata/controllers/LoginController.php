@@ -72,4 +72,10 @@ class LoginController extends Pix_Controller
             return $this->noview();
         }
     }
+
+    public function logoutAction()
+    {
+        Pix_Session::delete('member_id');
+        return $this->redirect('/');
+    }
 }
