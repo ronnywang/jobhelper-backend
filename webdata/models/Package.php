@@ -41,5 +41,8 @@ class Package extends Pix_Table
         $this->_columns['created_at'] = array('type' => 'int', 'default' => 0);
         $this->_columns['team_id'] = array('type' => 'int');
         $this->_columns['note'] = array('type' => 'text');
+        $this->_columns['package_time'] = array('type' => 'int', 'default' => 0);
+
+        $this->_relations['content'] = array('rel' => 'has_one', 'type' => 'PackageContent', 'foreign_key' => 'package_id');
     }
 }
