@@ -20,7 +20,23 @@ class ApiController extends Pix_Controller
             $packages[] = $package_info;
         }
         $ret->packages = $packages;
+        $ret->error = false;
 
+        return $this->json($ret);
+    }
+
+    public function getpackageAction()
+    {
+        $ret = new StdClass;
+
+        if (!$package = Package::find(intval($_GET['id']))) {
+            $ret->error = true;
+            $ret->message = '找不到這個資料包';
+            return $this->json($ret);
+        }
+
+        $ret->package_time = $package->package_time;
+        $ret->content = $package->content->content;
         return $this->json($ret);
     }
 }
