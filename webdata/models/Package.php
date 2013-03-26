@@ -11,6 +11,19 @@ class PackageRow extends Pix_Table_Row
     {
         $this->updated_at = time();
     }
+
+    public function canEdit($obj)
+    {
+        if (Pix_Table::is_a($obj, 'Team')) {
+            return $obj->team_id == $this->team_id;
+        }
+
+        if (Pix_Table::is_a($obj, 'TeamMember')) {
+            return $obj->team_id == $this->team_id;
+        }
+
+        return false;
+    }
 }
 
 class Package extends Pix_Table
