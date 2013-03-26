@@ -1,0 +1,10 @@
+<?= $this->partial('/common/header.phtml', $this) ?>
+<h3>資料包管理</h3>
+<form method="post" action="/panel/editpackage/<?= $this->package->package_id ?>">
+    <input type="hidden" name="sToken" value="<?= $this->sToken ?>">
+    名稱: <input type="text" name="name" value="<?= $this->escape($this->package->name) ?>"><br>
+    說明: (請加入「資料來源」、「更新頻率」、「資訊取得方式」、「資料錯誤連絡方式」等資訊)<br>
+    <textarea name="note" cols="80" rows="6"><?= $this->escape($this->package->note) ?></textarea><br>
+    <button type="submit">修改</button>
+</form>
+<?= $this->partial('/common/footer.phtml', $this) ?>

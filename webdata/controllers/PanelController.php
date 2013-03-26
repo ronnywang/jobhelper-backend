@@ -44,6 +44,37 @@ class PanelController extends Pix_Controller
         }
     }
 
+    public function editpackageAction()
+    {
+        list(, /*panel*/, /*editpackage*/, $id) = explode('/', $this->getURI());
+
+        if (!$_POST['sToken']) {
+            return $this->alert('wrong Stoken', '/panel/package');
+        }
+        if ($_POST['sToken'] != $this->view->sToken) {
+            return $this->alert('wrong Stoken', '/panel/package');
+        }
+
+        if (!$package = Package::find($id) or !$package->canEdit($this->view->member)) {
+            return $this->redirect('/panel/package');
+        }
+        $package->update(array(
+            'name' => strval($_POST['name']),
+            'note' => strval($_POST['note']),
+        ));
+        return $this->alert('OK', '/panel/showpackage/' . $package->package_id);
+    }
+
+    public function showpackageAction()
+    {
+        list(, /*panel*/, /*showpackage*/, $id) = explode('/', $this->getURI());
+
+        if (!$package = Package::find($id) or !$package->canEdit($this->view->member)) {
+            return $this->redirect('/panel/package');
+        }
+        $this->view->package = $package;
+    }
+
     public function newpackageAction()
     {
         if (!$_POST['sToken']) {
