@@ -1,0 +1,15 @@
+<?= $this->partial('/common/header.phtml', $this) ?>
+<h3>群組資訊</h3>
+<form method="post" action="/panel/team">
+    <input type="hidden" name="sToken" value="<?= $this->sToken ?>">
+    名稱: <input type="text" name="name" value="<?= $this->escape($this->team->name) ?>"><br>
+    群組資料及連絡方式: <textarea name="note"><?= $this->escape($this->team->note) ?></textarea><br>
+    <button type="submit">修改</button>
+</form>
+<h3>群組成員</h3>
+<ul>
+    <?php foreach (TeamMember::search(array('team_id' => $this->team->team_id)) as $member) { ?>
+    <li><?= $this->escape($member->user_name) ?></li>
+    <?php } ?>
+<ul>
+<?= $this->partial('/common/footer.phtml', $this) ?>
