@@ -72,7 +72,51 @@ class PanelController extends Pix_Controller
         if (!$package = Package::find($id) or !$package->canEdit($this->view->member)) {
             return $this->redirect('/panel/package');
         }
+        if ($_GET['action'] == 'updatecontent') {
+            $ret = $this->updateContent($package, $_POST['content']);
+            if (!$ret['error']) {
+                return $this->alert('OK', '/panel/showpackage/' . $id);
+            }
+            $this->view->content = $_POST['content'];
+            $this->view->error_message = $ret['message'];
+
+        }
         $this->view->package = $package;
+    }
+
+    protected function updateContent($package, $content)
+    {
+        // 檢查 content
+        foreach (explode("\n", trim($content)) as $no => $line) {
+            $no = $no + 1;
+            $terms = str_getcsv($line);
+
+            if (count($terms) < 5) {
+                return array('error' => true, 'message' => "每一行至少要有 5 列，第 {$no} 行只有 " . count($terms));
+            }
+
+            if (false === strtotime($terms[1])) {
+                return array('error' => true, 'message' => "第 {$no} 行是無法判別的日期格式: " . $terms[1]);
+            }
+
+            if (!filter_var($terms[3], FILTER_VALIDATE_URL)) {
+                return array('error' => true, 'message' => "第四列是必需是原始連結，第 {$no} 行的連結不是正確的網址格式");
+            }
+        }
+
+        try {
+            $package->create_content(array(
+                'content' => $content,
+            ));
+        } catch (Pix_Table_DuplicateException $e) {
+            $package->content->update(array(
+                'content' => $content,
+            ));
+        }
+
+        $package->update(array('package_time' => time()));
+
+        return array('error' => false);
     }
 
     public function newpackageAction()
