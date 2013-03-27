@@ -35,8 +35,13 @@ class ApiController extends Pix_Controller
             return $this->json($ret);
         }
 
-        $ret->package_time = $package->package_time;
-        $ret->content = $package->content->content;
+        $ret->package_time = intval($package->package_time);
+        $content = $package->content->content;
+        $rows = array();
+        foreach (explode("\n", trim($content)) as $line) {
+            $rows[] = str_getcsv($line);
+        }
+        $ret->content = $rows;
         return $this->json($ret);
     }
 }
