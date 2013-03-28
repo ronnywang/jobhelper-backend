@@ -15,15 +15,6 @@ class PanelController extends Pix_Controller
         $this->view->sToken = $sToken;
     }
 
-    public function packageAction()
-    {
-        list(, /*panel*/, /*package*/, $team_id) = explode('/', $this->getURI());
-        $this->view->team = $this->view->user->user_teams->search(array('team_id' => $team_id))->first()->team;
-        if (!$this->view->team) {
-            return $this->redirect('/');
-        }
-    }
-
     public function teamAction()
     {
         list(, /*panel*/, /*team*/, $team_id) = explode('/', $this->getURI());
