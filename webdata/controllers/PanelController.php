@@ -164,23 +164,31 @@ class PanelController extends Pix_Controller
 
     public function newpackageAction()
     {
+        list(, /*panel*/, /*addteammember*/, $team_id) = explode('/', $this->getURI());
+
         if (!$_POST['sToken']) {
             return $this->alert('wrong Stoken', '/panel/package');
         }
         if ($_POST['sToken'] != $this->view->sToken) {
             return $this->alert('wrong Stoken', '/panel/package');
         }
-        $this->view->team = $this->view->member->team;
-        if (!$this->view->team) {
-            return $this->redirect('/');
+
+        $team = $this->view->user->user_teams->search(array('team_id' => $team_id))->first()->team;
+        if (!$team) {
+            return $this->alert('找不到群組', '/');
         }
 
-        Package::insert(array(
+        $package = Package::insert(array(
             'name' => strval($_POST['name']),
             'team_id' => $this->view->team->team_id,
             'note' => strval($_POST['note']),
         ));
 
-        return $this->alert('OK', '/panel/package');
+        TeamPackage::insert(array(
+            'team_id' => $team->team_id,
+            'package_id' => $package->package_id,
+        ));
+
+        return $this->alert('OK', '/panel/package/' . $package->package_id);
     }
 }
