@@ -1,0 +1,29 @@
+<?= $this->partial('/common/header.phtml', $this) ?>
+<h3><?= $this->escape($this->package->name) ?></h3>
+說明:<br>
+<?= nl2br($this->escape($this->package->note)) ?>
+<hr>
+<h4>現在資料</h4>
+<table class="table">
+    <thead>
+        <tr>
+            <td>公司名稱</td>
+            <td>發生日期</td>
+            <td>發生事由</td>
+            <td>來源</td>
+            <td>截圖</td>
+        </tr>
+    </thead>
+    <tbody>
+    <?php foreach (explode("\n", trim($this->package->content->content)) as $line) { $rows = str_getcsv($line); ?>
+    <tr>
+        <td><?= $this->escape($rows[0]) ?></td>
+        <td><?= $this->escape($rows[1]) ?></td>
+        <td><?= $this->escape($rows[2]) ?></td>
+        <td><a href="<?= $this->escape($rows[3]) ?>" rel="nofollow" target="_blank"><?= $this->escape($rows[3]) ?></a></td>
+        <td><a href="<?= $this->escape($rows[4]) ?>" rel="nofollow" target="_blank"><?= $this->escape($rows[4]) ?></a></td>
+    </tr>
+    <?php } ?>
+    </tbody>
+</table>
+<?= $this->partial('/common/footer.phtml', $this) ?>
