@@ -180,7 +180,7 @@ class PanelController extends Pix_Controller
 
         $package = Package::insert(array(
             'name' => strval($_POST['name']),
-            'team_id' => $this->view->team->team_id,
+            'team_id' => $team->team_id,
             'note' => strval($_POST['note']),
         ));
 
