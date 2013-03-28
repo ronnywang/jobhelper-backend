@@ -1,26 +1,20 @@
 <?= $this->partial('/common/header.phtml', $this) ?>
-<h3>最新資訊</h3>
-<ul>
-    <?php foreach (CompanyEvent::search(1)->order('id DESC')->limit(10) as $event) { ?>
-    <?php $company_info = CompanyInfo::get($event->company_no); ?>
-    <li>
-    <?= date('Y/m/d', $event->time) ?>. <a href="http://company.g0v.ronny.tw/id/<?= $event->company_no ?>" target="_blank"><?= $this->escape($company_info->{'公司名稱'}) ?></a> <?= $this->escape($event->message) ?>
-    <?php if ($event->from) { ?>
-    [<a href="<?= $this->escape($event->from) ?>" target="_blank">來源</a>]
+<table class="table">
+    <thead>
+        <tr>
+            <td>資料包名稱</td>
+            <td>上傳人</td>
+            <td>最近更新時間</td>
+        </tr>
+    </thead>
+    <tbody>
+    <?php foreach (Package::search(1) as $package) { ?>
+    <tr>
+        <td><?= $this->escape($package->name) ?></td>
+        <td><?= $this->escape($package->team->name) ?></td>
+        <td><?= $this->partial('/helper/counttime.phtml', array('time' => $package->package_time)) ?></td>
+    </tr>
     <?php } ?>
-    <?php if ($eent->snapshot) { ?>
-    [<a href="<?= $this->escape($event->snapshot) ?>" target="_blank">截圖</a>]
-    <?php } ?>
-    </li>
-    <?php } ?>
-</ul>
-<h3>增加資訊</h3>
-<form method="post" action="/index/post">
-    公司統編: <input type="text" name="company_no">(可至 <a href="http://company.g0v.ronny.tw/" target="_blank">這邊</a> 查詢，目前只支援有統編公司)<br>
-    時間: <input type="text" name="time" placeholder="Ex: <?= date('Y/m/d') ?>"><br>
-    來源: <input type="text" name="from" size="100"><br>
-    截圖: <input type="text" name="snapshot" size="100"><br>
-    資訊內容: <input type="text" name="message"><br>
-    <button type="submit">送出</button>
-</form>
+    </tbody>
+</table>
 <?= $this->partial('/common/footer.phtml', $this) ?>
