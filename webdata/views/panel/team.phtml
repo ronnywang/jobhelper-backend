@@ -11,5 +11,11 @@
     <?php foreach (TeamMember::search(array('team_id' => $this->team->team_id)) as $member) { ?>
     <li><?= $this->escape($member->user->user_name) ?></li>
     <?php } ?>
+    <li>
+    <form method="post" action="/panel/addteammember/<?= $this->team->team_id ?>">
+        <input type="hidden" name="sToken" value="<?= $this->sToken ?>">
+        帳號: <input type="text" name="user_name" placeholder="請輸入 google://[gmail信箱]"><br>
+        <button type="submit">新增</button>
+    </form>
 <ul>
 <?= $this->partial('/common/footer.phtml', $this) ?>

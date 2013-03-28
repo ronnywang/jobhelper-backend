@@ -86,6 +86,47 @@ class PanelController extends Pix_Controller
         $this->view->package = $package;
     }
 
+    public function addteammemberAction()
+    {
+        list(, /*panel*/, /*addteammember*/, $team_id) = explode('/', $this->getURI());
+
+        if (!$_POST['sToken']) {
+            return $this->alert('wrong Stoken', '/panel/package');
+        }
+        if ($_POST['sToken'] != $this->view->sToken) {
+            return $this->alert('wrong Stoken', '/panel/package');
+        }
+
+        $team = $this->view->user->user_teams->search(array('team_id' => $team_id))->first()->team;
+        if (!$team) {
+            return $this->alert('找不到群組', '/');
+        }
+
+        if (!preg_match('#^google://(.*)$#', $_POST['user_name'], $matches)) {
+            return $this->alert('必需是 google://xxx 格式', '/panel/team/' . $team->team_id);
+        }
+
+        if (!filter_var($matches[1], FILTER_VALIDATE_EMAIL)) {
+            return $this->alert('不是合法 gmail', '/panel/team/' . $team->team_id);
+        }
+
+        try {
+            $user = User::insert(array('user_name' => $_POST['user_name']));
+        } catch (Pix_Table_DuplicateException $e) {
+            $user = User::search(array('user_name' => $_POST['user_name']))->first();
+        }
+
+        try {
+            TeamMember::insert(array(
+                'team_id' => $team->team_id,
+                'user_id' => $user->user_id,
+            ));
+        } catch (Pix_Table_DuplicateException $e) {
+        }
+
+        return $this->alert('成功', '/panel/team/' . $team->team_id);
+    }
+
     protected function updateContent($package, $content)
     {
         // 檢查 content
