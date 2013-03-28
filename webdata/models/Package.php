@@ -44,5 +44,6 @@ class Package extends Pix_Table
         $this->_columns['package_time'] = array('type' => 'int', 'default' => 0);
 
         $this->_relations['content'] = array('rel' => 'has_one', 'type' => 'PackageContent', 'foreign_key' => 'package_id');
+        $this->_relations['team'] = array('rel' => 'has_one', 'type' => 'Team', 'foreign_key' => 'team_id');
     }
 }
