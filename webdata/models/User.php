@@ -12,5 +12,7 @@ class User extends Pix_Table
         $this->_columns['user_name'] = array('type' => 'varchar', 'size' => 64);
 
         $this->addIndex('user_name', array('user_name'), 'unique');
+
+        $this->_relations['user_teams'] = array('rel' => 'has_many', 'type' => 'TeamMember', 'foreign_key' => 'user_id');
     }
 }
