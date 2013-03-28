@@ -10,7 +10,7 @@
     <tbody>
     <?php foreach (Package::search(1) as $package) { ?>
     <tr>
-        <td><?= $this->escape($package->name) ?></td>
+        <td><a href="/package/show/<?= $package->package_id ?>"><?= $this->escape($package->name) ?></a></td>
         <td><?= $this->escape($package->team->name) ?></td>
         <td><?= $this->partial('/helper/counttime.phtml', array('time' => $package->package_time)) ?></td>
     </tr>
