@@ -9,7 +9,7 @@
 <h3>群組成員</h3>
 <ul>
     <?php foreach (TeamMember::search(array('team_id' => $this->team->team_id)) as $member) { ?>
-    <li><?= $this->escape($member->user_name) ?></li>
+    <li><?= $this->escape($member->user->user_name) ?></li>
     <?php } ?>
 <ul>
 <?= $this->partial('/common/footer.phtml', $this) ?>
