@@ -4,8 +4,8 @@ class PanelController extends Pix_Controller
 {
     public function init()
     {
-        $this->view->member = ($member_id = Pix_Session::get('member_id')) ? TeamMember::find(intval($member_id)) : null;
-        if (!$this->view->member) {
+        $this->view->user = ($user_id= Pix_Session::get('user_id')) ? User::find(intval($user_id)) : null;
+        if (!$this->view->user) {
             return $this->redirect('/');
         }
         if (!$sToken = Pix_Session::get('sToken')) {
@@ -17,7 +17,8 @@ class PanelController extends Pix_Controller
 
     public function packageAction()
     {
-        $this->view->team = $this->view->member->team;
+        list(, /*panel*/, /*package*/, $team_id) = explode('/', $this->getURI());
+        $this->view->team = $this->view->user->user_teams->search(array('team_id' => $team_id))->first()->team;
         if (!$this->view->team) {
             return $this->redirect('/');
         }
@@ -25,7 +26,8 @@ class PanelController extends Pix_Controller
 
     public function teamAction()
     {
-        $this->view->team = $this->view->member->team;
+        list(, /*panel*/, /*team*/, $team_id) = explode('/', $this->getURI());
+        $this->view->team = $this->view->user->user_teams->search(array('team_id' => $team_id))->first()->team;
         if (!$this->view->team) {
             return $this->redirect('/');
         }
@@ -55,7 +57,7 @@ class PanelController extends Pix_Controller
             return $this->alert('wrong Stoken', '/panel/package');
         }
 
-        if (!$package = Package::find($id) or !$package->canEdit($this->view->member)) {
+        if (!$package = Package::find($id) or !$package->canEdit($this->view->user)) {
             return $this->redirect('/panel/package');
         }
         $package->update(array(
@@ -69,7 +71,7 @@ class PanelController extends Pix_Controller
     {
         list(, /*panel*/, /*showpackage*/, $id) = explode('/', $this->getURI());
 
-        if (!$package = Package::find($id) or !$package->canEdit($this->view->member)) {
+        if (!$package = Package::find($id) or !$package->canEdit($this->view->user)) {
             return $this->redirect('/panel/package');
         }
         if ($_GET['action'] == 'updatecontent') {

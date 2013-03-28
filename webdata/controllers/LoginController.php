@@ -35,10 +35,10 @@ class LoginController extends Pix_Controller
         $obj = $ax->fromSuccessResponse($response);
         $email = $obj->data['http://axschema.org/contact/email'][0];
 
-        if (!$member = TeamMember::search(array('user_name' => 'google://' . $email))->first()) {
+        if (!$user = User::search(array('user_name' => 'google://' . $email))->first()) {
             return $this->alert('您不在管理名單中', '/');
         }
-        Pix_Session::set('member_id', $member->user_id);
+        Pix_Session::set('user_id', $user->user_id);
         return $this->redirect('/');
     }
 
@@ -75,7 +75,7 @@ class LoginController extends Pix_Controller
 
     public function logoutAction()
     {
-        Pix_Session::delete('member_id');
+        Pix_Session::delete('user_id');
         return $this->redirect('/');
     }
 }
