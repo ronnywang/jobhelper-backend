@@ -17,6 +17,7 @@ class ApiController extends Pix_Controller
             $package_info->url = 'http://' . $_SERVER['SERVER_NAME'] . '/package/show/' . $package->package_id;
             $package_info->updated_at = intval($package->updated_at);
             $package_info->package_time = intval($package->package_time);
+            $package_info->default = true;
             $packages[] = $package_info;
         }
         $ret->packages = $packages;
