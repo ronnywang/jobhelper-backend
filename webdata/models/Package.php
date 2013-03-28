@@ -15,11 +15,20 @@ class PackageRow extends Pix_Table_Row
     public function canEdit($obj)
     {
         if (Pix_Table::is_a($obj, 'Team')) {
-            return $obj->team_id == $this->team_id;
+            return TeamPackage::search(array('team_id' => $obj->team_id, 'package_id' => $this->package_id))->count();
         }
 
         if (Pix_Table::is_a($obj, 'TeamMember')) {
-            return $obj->team_id == $this->team_id;
+            return TeamPackage::search(array('team_id' => $obj->team_id, 'package_id' => $this->package_id))->count();
+        }
+
+        if (Pix_Table::is_a($obj, 'User')) {
+            foreach (TeamMember::search(array('user_id' => $obj->user_id)) as $team_member) {
+                if (TeamPackage::search(array('team_id' => $team_member->team_id, 'package_id' => $this->package_id))->count()) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         return false;
