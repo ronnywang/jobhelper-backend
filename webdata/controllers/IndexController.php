@@ -12,7 +12,7 @@ class IndexController extends Pix_Controller
 
     public function indexAction()
     {
-        $this->view->member = ($member_id = Pix_Session::get('member_id')) ? TeamMember::find(intval($member_id)) : null;
+        $this->view->user = ($user_id = Pix_Session::get('user_id')) ? User::find(intval($user_id)) : null;
     }
 
     public function infoAction()

@@ -34,10 +34,14 @@ _gaq.push(['_trackPageview']);
             <li>
             <a href="http://ronnywang.pixnet.net/blog" target="_blank">@ronnywang</a>
             </li>
-            <?php if ($this->member) { ?>
+            <?php if ($this->user) { ?>
             <li class="dropdown">
-            <a data-toggle="dropdown" class="dropdown-toggle" href="#">Hi! <?= $this->escape($this->member->user_name) ?>(<?= $this->escape($this->member->team->name) ?>)<b class="caret"></b></a>
+            <a data-toggle="dropdown" class="dropdown-toggle" href="#">Hi! <?= $this->escape($this->user->user_name) ?><b class="caret"></b></a>
             <ul class="dropdown-menu">
+                <?php foreach ($this->user->user_teams as $user_team) { ?>
+                <li><a href="/panel/team/<?= $user_team->team_id ?>"><?= $this->escape($user_team->team->name) ?></a></li>
+                <?php } ?>
+                <li class="divider">群組管理</li>
                 <li><a href="/panel/package">資料包管理</a></li>
                 <li><a href="/panel/team">群組管理</a></li>
                 <li class="divider"></li>
