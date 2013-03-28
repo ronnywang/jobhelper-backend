@@ -8,6 +8,24 @@
     <button type="submit">修改</button>
 </form>
 <hr>
+<h3>可以管理這個資料包的名單</h3>
+<ol>
+    <?php foreach (TeamPackage::search(array('package_id' => $this->package->package_id)) as $team_package) { ?>
+    <li><?= $this->escape($team_package->team->name) ?></li>
+    <?php } ?>
+    <li>
+    <form method="post" action="/panel/newpackageteam/<?= $this->package->package_id ?>">
+        <input type="hidden" name="sToken" value="<?= $this->sToken ?>">
+        選擇團體: <select name="team_id">
+            <option>請選擇要增加的群組</option>
+            <?php foreach (Team::search(1) as $team) { ?>
+            <option value="<?= $team->team_id ?>"><?= $this->escape($team->name) ?></option>
+            <?php } ?>
+        </select>
+        <button type="submit">新增</button>
+    </form>
+    </li>
+</ol>
 <h3>更新資料包內容</h3>
 <form method="post" action="/panel/showpackage/<?= $this->package->package_id ?>?action=updatecontent">
     <input type="hidden" name="sToken" value="<?= $this->sToken ?>">

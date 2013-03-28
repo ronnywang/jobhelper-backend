@@ -42,14 +42,14 @@ class PanelController extends Pix_Controller
         list(, /*panel*/, /*editpackage*/, $id) = explode('/', $this->getURI());
 
         if (!$_POST['sToken']) {
-            return $this->alert('wrong Stoken', '/panel/package');
+            return $this->alert('wrong Stoken', '/panel/showpackage/' . intval($id));
         }
         if ($_POST['sToken'] != $this->view->sToken) {
-            return $this->alert('wrong Stoken', '/panel/package');
+            return $this->alert('wrong Stoken', '/panel/showpackage/' . intval($id));
         }
 
         if (!$package = Package::find($id) or !$package->canEdit($this->view->user)) {
-            return $this->redirect('/panel/package');
+            return $this->redirect('/');
         }
         $package->update(array(
             'name' => strval($_POST['name']),
@@ -63,7 +63,7 @@ class PanelController extends Pix_Controller
         list(, /*panel*/, /*showpackage*/, $id) = explode('/', $this->getURI());
 
         if (!$package = Package::find($id) or !$package->canEdit($this->view->user)) {
-            return $this->redirect('/panel/package');
+            return $this->redirect('/');
         }
         if ($_GET['action'] == 'updatecontent') {
             $ret = $this->updateContent($package, $_POST['content']);
@@ -82,10 +82,10 @@ class PanelController extends Pix_Controller
         list(, /*panel*/, /*addteammember*/, $team_id) = explode('/', $this->getURI());
 
         if (!$_POST['sToken']) {
-            return $this->alert('wrong Stoken', '/panel/package');
+            return $this->alert('wrong Stoken', '/');
         }
         if ($_POST['sToken'] != $this->view->sToken) {
-            return $this->alert('wrong Stoken', '/panel/package');
+            return $this->alert('wrong Stoken', '/');
         }
 
         $team = $this->view->user->user_teams->search(array('team_id' => $team_id))->first()->team;
@@ -158,10 +158,10 @@ class PanelController extends Pix_Controller
         list(, /*panel*/, /*addteammember*/, $team_id) = explode('/', $this->getURI());
 
         if (!$_POST['sToken']) {
-            return $this->alert('wrong Stoken', '/panel/package');
+            return $this->alert('wrong Stoken', '/');
         }
         if ($_POST['sToken'] != $this->view->sToken) {
-            return $this->alert('wrong Stoken', '/panel/package');
+            return $this->alert('wrong Stoken', '/');
         }
 
         $team = $this->view->user->user_teams->search(array('team_id' => $team_id))->first()->team;
@@ -180,6 +180,38 @@ class PanelController extends Pix_Controller
             'package_id' => $package->package_id,
         ));
 
-        return $this->alert('OK', '/panel/package/' . $package->package_id);
+        return $this->alert('OK', '/panel/showpackage/' . $package->package_id);
+    }
+
+    public function newpackageteamAction()
+    {
+        list(, /*panel*/, /*newpackageteam*/, $package_id) = explode('/', $this->getURI());
+
+        if (!$_POST['sToken']) {
+            return $this->alert('wrong Stoken', '/');
+        }
+        if ($_POST['sToken'] != $this->view->sToken) {
+            return $this->alert('wrong Stoken', '/');
+        }
+
+        $package = Package::find($package_id);
+        if (!$package or !$package->canEdit($this->view->user)) {
+            return $this->alert('找不到資料包', '/');
+        }
+
+        $team = Team::find(intval($_POST['team_id']));
+        if (!$team) {
+            return $this->alert('找不到這個群組', '/panel/showpackage/' . $package->package_id);
+        }
+
+        try {
+            TeamPackage::insert(array(
+                'team_id' => intval($team->team_id),
+                'package_id' => $package->package_id,
+            )); 
+        } catch (Pix_Table_DuplicateException $e) {
+        }
+
+        return $this->alert('OK', '/panel/showpackage/' . $package->package_id);
     }
 }
