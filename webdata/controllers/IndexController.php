@@ -26,5 +26,6 @@ class IndexController extends Pix_Controller
 
     public function allcsvAction()
     {
+        header('Content-Type: text/csv');
     }
 }
