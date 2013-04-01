@@ -1,0 +1,17 @@
+<?php
+$fp = fopen('php://output', 'w');
+fputcsv($fp, array(
+    '公司名稱',
+    '事件日期',
+    '說明原因',
+    '原始連結',
+    '截圖連結',
+));
+
+foreach (Package::search(1) as $package) {
+    if ('' == trim($package->content->content)) {
+        continue;
+    }
+    fputs($fp, trim($package->content->content) . "\n");
+}
+

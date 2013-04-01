@@ -23,4 +23,8 @@ class IndexController extends Pix_Controller
         return $this->redraw('/index/company.phtml');
 
     }
+
+    public function allcsvAction()
+    {
+    }
 }
