@@ -4,7 +4,7 @@
     <input type="hidden" name="sToken" value="<?= $this->sToken ?>">
     名稱: <input type="text" name="name" value="<?= $this->escape($this->package->name) ?>"><br>
     說明: (請加入「資料來源」、「更新頻率」、「資訊取得方式」、「資料錯誤連絡方式」等資訊)<br>
-    <textarea name="note" cols="80" rows="6"><?= $this->escape($this->package->note) ?></textarea><br>
+    <textarea class="span12" name="note" cols="80" rows="6"><?= $this->escape($this->package->note) ?></textarea><br>
     <button type="submit">修改</button>
 </form>
 <hr>
@@ -31,7 +31,7 @@
     <input type="hidden" name="sToken" value="<?= $this->sToken ?>">
     請貼上 CSV 內容，欄位分別為 [公司名稱],[事件日期],[說明原因],[原始連結],[截圖連結]<br>
     Ex: <code>台灣麥當勞餐廳股份有限公司,2012/12/7,違反勞基法第24條(延長工作時間未依規定加給工資)　北府勞條字第1013064746號函,http://www.labor.ntpc.gov.tw/_file/1075/SG/46207/D.html,,</code><br>
-    <textarea name="content" cols="80" rows="6"><?= $this->escape($this->content ?: $this->package->content->content) ?></textarea>
+    <textarea class="span12" name="content" cols="80" rows="6"><?= $this->escape($this->content ?: $this->package->content->content) ?></textarea>
     <button type="submit">修改</button>
 </form>
 <?php if ($this->error_message) { ?>
