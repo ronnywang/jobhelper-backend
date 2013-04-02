@@ -16,4 +16,16 @@ class PackageController extends Pix_Controller
 
         $this->view->package = $package;
     }
+
+    public function downloadcsvAction()
+    {
+        list(, /*package*/, /*show*/, $id) = explode('/', $this->getURI());
+        if (!$package = Package::find($id)) {
+            return $this->redirect('/');
+        }
+
+        header('Content-Type: text/csv');
+        echo $package->content->content;
+        return $this->noview();
+    }
 }
