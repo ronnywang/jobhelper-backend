@@ -11,12 +11,17 @@ $ret = curl_exec($curl);
 $doc = new DOMDocument();
 @$doc->loadHTML($ret);
 
-foreach ($doc->getElementsByTagName('table') as $table_dom) {
-    if ($table_dom->getAttribute('summary') == '臺北市違反勞動基準法事業單位事業主公布一覽表') {
-        break;
-    }
-}
+$table_dom = $doc->getElementsByTagName('tbody')->item(0);
 
+$fp = fopen('php://output', 'w');
+
+fputcsv($fp, array(
+    '事業名稱',
+    '時間',
+    '違反事由',
+    '原始連結',
+    '截圖連結',
+));
 foreach ($table_dom->getElementsByTagName('tr') as $tr_dom) {
     if (!$tr_dom->getElementsByTagName('td')->length) {
         continue;
@@ -24,13 +29,9 @@ foreach ($table_dom->getElementsByTagName('tr') as $tr_dom) {
     $td_doms = $tr_dom->getElementsByTagName('td');
     $name = $td_doms->item(1)->nodeValue;
     $violation = $td_doms->item(2)->nodeValue;
-    $number = $td_doms->item(3)->nodeValue;
-    $date = $td_doms->item(4)->nodeValue;
-
-    if (!$no = CompanyService::getCompanyByName($name)) {
-        // TODO: 找不到
-        continue;
-    }
+    $violation_content = $td_doms->item(3)->nodeValue;
+    $number = $td_doms->item(4)->nodeValue;
+    $date = $td_doms->item(5)->nodeValue;
 
     if (!preg_match('#(.*)年(.*)月(.*)日#', $date, $matches)) {
         continue;
@@ -38,11 +39,12 @@ foreach ($table_dom->getElementsByTagName('tr') as $tr_dom) {
 
     $time = mktime(0, 0, 0, $matches[2], $matches[3], $matches[1] + 1911);
 
-    CompanyEvent::insert(array(
-        'company_no' => $no,
-        'time' => $time,
-        'from' => 'http://www.bola.taipei.gov.tw/ct.asp?xItem=41223990&ctNode=62846&mp=116003',
-        'snapshot' => '',
-        'message' => "違反 {$violation}, 文號: {$number}",
+
+    fputcsv($fp, array(
+        trim($name),
+        date('Y/m/d', $time),
+        trim('違反 勞動基準法' . $violation . ', 文號: ' . $number),
+        'http://www.bola.taipei.gov.tw/ct.asp?xItem=41223990&ctNode=62846&mp=116003',
+        '',
     ));
 }
