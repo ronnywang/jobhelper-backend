@@ -25,6 +25,14 @@ class PackageController extends Pix_Controller
         }
 
         header('Content-Type: text/csv');
+        $fp = fopen('php://output', 'w');
+        fputcsv($fp, array(
+            '事業名稱',
+            '時間',
+            '違反事由',
+            '原始連結',
+            '截圖連結',
+        ));
         echo $package->content->content;
         return $this->noview();
     }
