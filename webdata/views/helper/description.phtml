@@ -1,0 +1,11 @@
+<?php
+
+$url_regex = '/http(s)?:\/\/[^\s]*/';
+
+$description = $this->escape($this->description);
+$description = preg_replace_callback($url_regex, function($match){
+    return '<a href="' . $match[0] . '" target="_blank">' . $match[0] . '</a>';
+}, $description);
+
+?>
+<?= nl2br($description); ?>
