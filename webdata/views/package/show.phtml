@@ -1,5 +1,10 @@
 <?= $this->partial('/common/header.phtml', $this) ?>
-<h3><?= $this->escape($this->package->name) ?></h3>
+<h3>
+    <?= $this->escape($this->package->name) ?>
+    <?php if ($this->user and $this->package->canEdit($this->user)) { ?>
+    <a href="/panel/showpackage/<?= $this->package->package_id ?>">修改</a>
+    <?php } ?>
+</h3>
 說明:<br>
 <?= $this->partial('/helper/description.phtml', array('description' => $this->package->note)) ?>
 <hr>
