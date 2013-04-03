@@ -10,8 +10,7 @@
             <td>公司名稱</td>
             <td>發生日期</td>
             <td>發生事由</td>
-            <td>來源</td>
-            <td>截圖</td>
+            <td>連結</td>
         </tr>
     </thead>
     <tbody>
@@ -20,8 +19,14 @@
         <td><?= $this->escape($rows[0]) ?></td>
         <td><?= $this->escape($rows[1]) ?></td>
         <td><?= $this->escape($rows[2]) ?></td>
-        <td><a href="<?= $this->escape($rows[3]) ?>" rel="nofollow" target="_blank"><?= $this->escape($rows[3]) ?></a></td>
-        <td><a href="<?= $this->escape($rows[4]) ?>" rel="nofollow" target="_blank"><?= $this->escape($rows[4]) ?></a></td>
+        <td>
+            <?php if ($rows[3]) { ?>
+            <a href="<?= $this->escape($rows[3]) ?>" rel="nofollow" target="_blank">來源</a>
+            <?php } ?>
+            <?php if ($rows[4]) { ?>
+            <a href="<?= $this->escape($rows[4]) ?>" rel="nofollow" target="_blank">截圖</a>
+            <?php } ?>
+        </td>
     </tr>
     <?php } ?>
     </tbody>
