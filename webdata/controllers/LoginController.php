@@ -8,12 +8,9 @@ class LoginController extends Pix_Controller
         include(__DIR__ . '/../stdlibs/php-openid/Auth/OpenID/Consumer.php');
         include(__DIR__ . '/../stdlibs/php-openid/Auth/OpenID/AX.php');
         include(__DIR__ . '/../stdlibs/php-openid/Auth/OpenID/PAPE.php');
-        include(__DIR__ . '/../stdlibs/php-openid/Auth/OpenID/MemcachedStore.php');
-        $memcache = new MemcacheSASL();
-        $memcache->addServer(getenv('MEMCACHE_SERVER'), getenv('MEMCACHE_PORT'));
-        $memcache->setSaslAuthData(getenv('MEMCACHE_USERNAME'), getenv('MEMCACHE_PASSWORD'));
+        include(__DIR__ . '/../stdlibs/php-openid/Auth/OpenID/Interface.php');
 
-        $store = new Auth_OpenID_MemcachedStore($memcache);
+        $store = new AuthOpenIDSessionStore();
         $consumer = new Auth_OpenID_Consumer($store);
         return $consumer;
     }
