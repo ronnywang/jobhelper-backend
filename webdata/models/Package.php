@@ -27,7 +27,6 @@ class PackageRow extends Pix_Table_Row
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PUT');
         curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
         $ret = curl_exec($curl);
-        var_dump($ret);
     }
 
     public function preInsert()
