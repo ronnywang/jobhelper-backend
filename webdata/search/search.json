@@ -1,0 +1,18 @@
+{
+    "mappings": {
+        "packages" : {
+            "properties" : {
+                "資料包名稱" : {"type" : "string", "null_value" : "na", "index" : "analyzed", "analyzer" : "cjk"},
+                "公司名單" : {
+                    "properties" : {
+                          "公司名稱" : {"type" : "string", "null_value" : "na", "index" : "analyzed", "analyzer" : "cjk", "index_name" : "公司名稱"},
+                          "發生時間" : {"type" : "date", "null_value" : "na", "index_name" : "發生時間"},
+                          "發生事由" : {"type" : "string", "null_value" : "na", "index" : "analyzed", "analyzer" : "cjk", "index_name" : "發生事由"},
+                          "連結" : {"type" : "string", "null_value" : "na", "index_name" : "連結"},
+                          "截圖" : {"type" : "string", "null_value" : "na", "index_name" : "截圖"}
+                    }
+                }
+            }
+        }
+    }
+}
