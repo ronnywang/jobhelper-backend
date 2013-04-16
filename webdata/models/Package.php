@@ -2,33 +2,6 @@
 
 class PackageRow extends Pix_Table_Row
 {
-    public function updateToSearch()
-    {
-        $data = new StdClass;
-        $data->{'資料包名稱'} = $this->name;
-        $companies = array();
-        foreach (explode("\n", trim($this->content->content)) as $line) {
-            $rows = str_getcsv($line);
-            $company = new StdClass;
-            $company->{'公司名稱'} = $rows[0];
-            $company->{'發生時間'} = implode('-', explode('/', $rows[1]));
-            $company->{'發生事由'} = $rows[2];
-            $company->{'連結'} = $rows[3];
-            $company->{'截圖'} = $rows[4];
-            $companies[] = $company;
-        }
-        $data->{'公司名單'} = $companies;
-
-        $curl = curl_init();
-        $url = getenv('SEARCH_URL') . '/jobhelper/packages/' . $this->package_id;
-        curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_HEADER, 0);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PUT');
-        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
-        $ret = curl_exec($curl);
-    }
-
     public function preInsert()
     {
         $this->created_at = time();
