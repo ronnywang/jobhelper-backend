@@ -24,6 +24,7 @@
     <thead>
         <tr>
             <td>名稱</td>
+            <td>狀態</td>
             <td>建立時間</td>
             <td>更新時間</td>
         </tr>
@@ -33,6 +34,7 @@
     <?php $package = $team_package->package; ?>
     <tr>
         <td><a href="/panel/showpackage/<?= $package->package_id ?>"><?= $this->escape($package->name) ?></a></td>
+        <td><?= $package->status == 0 ? '線上' : '測試' ?></td>
         <td><?= $this->partial('/helper/counttime.phtml', array('time' => $package->created_at)) ?></td>
         <td><?= $this->partial('/helper/counttime.phtml', array('time' => $package->updated_at)) ?></td>
     </tr>
@@ -43,7 +45,10 @@
 <form method="post" action="/panel/newpackage/<?= $this->team->team_id ?>">
     <input type="hidden" name="sToken" value="<?= $this->sToken ?>">
     名稱 <input type="text" name="name"><br>
-    說明: <textarea name="note"></textarea>
+    說明: <textarea name="note"></textarea><br>
+    狀態: 
+    <label><input type="radio" name="status" value="1" checked="checked">測試</label>
+    <label><input type="radio" name="status" value="0">線上</label>
     <button type="submit">送出</button>
 </form>
 

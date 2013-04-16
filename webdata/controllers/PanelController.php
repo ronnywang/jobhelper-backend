@@ -54,6 +54,7 @@ class PanelController extends Pix_Controller
         $package->update(array(
             'name' => strval($_POST['name']),
             'note' => strval($_POST['note']),
+            'status' => intval($_POST['status']),
         ));
         return $this->alert('OK', '/panel/showpackage/' . $package->package_id);
     }
@@ -173,6 +174,7 @@ class PanelController extends Pix_Controller
             'name' => strval($_POST['name']),
             'team_id' => $team->team_id,
             'note' => strval($_POST['note']),
+            'status' => intval($_POST['status']),
         ));
 
         TeamPackage::insert(array(
