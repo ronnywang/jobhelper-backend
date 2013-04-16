@@ -10,7 +10,11 @@ class ApiController extends Pix_Controller
     {
         $ret = new StdClass;
         $packages = array();
-        foreach (Package::search(1) as $package) {
+        $search_cond = array('status' => 0);
+        if ($_GET['test'] == 1) {
+            $search_cond = 1;
+        }
+        foreach (Package::search($search_cond) as $package) {
             $package_info = new StdClass;
             $package_info->id = intval($package->package_id);
             $package_info->name = $package->name;

@@ -22,7 +22,7 @@
         </tr>
     </thead>
     <tbody>
-    <?php foreach (Package::search(1) as $package) { ?>
+    <?php foreach (Package::search(array('status' => 0)) as $package) { ?>
     <tr>
         <td><a href="/package/show/<?= $package->package_id ?>"><?= $this->escape($package->name) ?></a></td>
         <td><?= $this->escape($package->team->name) ?></td>
