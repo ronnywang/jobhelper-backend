@@ -64,6 +64,10 @@ class ApiController extends Pix_Controller
         $terms = array();
         // 處理 "宏達電 HTC Corporation_宏達國際電子股份有限公司"
         foreach (explode('_', $name) as $parted_name) {
+            // 包含 (xxxxx), Ex: 台灣保全股份有限公司(總公司)
+            if (preg_match('#\([^)]*\)#', $parted_name)) {
+                $parted_name = preg_replace('#\([^)]*\)#', '', $parted_name);
+            }
             // 名稱假如包含公司但不是公司結尾, Ex: xxx公司xx廠
             if (false !== strpos($parted_name, '公司') and !preg_match('#公司$#', $parted_name)) {
                 preg_match('#(.*公司)#', $parted_name, $matches);
