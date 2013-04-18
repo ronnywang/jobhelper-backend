@@ -75,6 +75,9 @@ class ApiController extends Pix_Controller
         $result = array('error' => false, 'data' => array());
         $data = array();
         foreach ($search_result->hits->hits as $hit) {
+            if (!in_array($hit->_source->package_id, $packages)) {
+                continue;
+            }
             $data[] = $hit->_source;
         }
         $result['data'] = $data;
