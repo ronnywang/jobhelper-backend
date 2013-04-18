@@ -2,6 +2,53 @@
 
 class PackageRow extends Pix_Table_Row
 {
+    public function updateToSearch()
+    {
+        // 先刪舊資料
+        $curl = curl_init();
+        $url = getenv('SEARCH_URL') . '/jobhelper/packages/_query?q=package_id:' . $this->package_id;
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'DELETE');
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        $ret = curl_exec($curl);
+
+        $requests = array();
+
+        $content = $this->content->content;
+        foreach (explode("\n", trim($content)) as $id => $line) {
+            if ($line == '') {
+                continue;
+            }
+            $id_info = new STdClass;
+            $id_info->index = new StdClass;
+            $id_info->index->_index = 'jobhelper';
+            $id_info->index->_type = 'packages';
+            $id_info->index->_id = $this->package_id . '-' . $id;
+            $requests[] = json_encode($id_info);
+
+            $rows = str_getcsv($line);
+            $row = new StdClass;
+            $row->package_id = $this->package_id;
+            $row->name = $rows[0];
+            $row->date = str_replace('/', '-', $rows[1]);
+            $row->reason = $rows[2];
+            $row->link = $rows[3];
+            $row->snapshot = $rows[4];
+            $requests[] = json_encode($row);
+        }
+
+        if (count($requests)) {
+            $curl = curl_init();
+            $url = getenv('SEARCH_URL') . '/jobhelper/_bulk';
+            curl_setopt($curl, CURLOPT_URL, $url);
+            curl_setopt($curl, CURLOPT_HEADER, 0);
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PUT');
+            curl_setopt($curl, CURLOPT_POSTFIELDS, implode("\n", $requests));
+            $ret = curl_exec($curl);
+        }
+    }
+
     public function preInsert()
     {
         $this->created_at = time();
