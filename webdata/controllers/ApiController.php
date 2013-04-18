@@ -49,4 +49,35 @@ class ApiController extends Pix_Controller
         $ret->content = $rows;
         return $this->json($ret);
     }
+
+    public function searchAction()
+    {
+        $name = strval($_GET['name']);
+        if (mb_strlen($name, 'UTF-8') < 3) {
+            return $this->json(array('error' => true, 'message' => '最少要三個字'));
+        }
+        // url 備用
+        // $url = strval($_GET['url']);
+        $packages = array_unique(array_map('intval', explode(',', strval($_GET['packages']))));
+
+        $q = urlencode('(name:"' . $name . '")');
+        $url = 'http://search-1.hisoku.ronny.tw:9200/jobhelper/_search?q=' . $q;
+
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        $content = curl_exec($curl);
+        $info = curl_getinfo($curl);
+        if ($info['http_code'] != 200) {
+            return $this->json(array('error' => true, 'message' => '搜尋出問題'));
+        }
+        $search_result = json_decode($content);
+        $result = array('error' => false, 'data' => array());
+        $data = array();
+        foreach ($search_result->hits->hits as $hit) {
+            $data[] = $hit->_source;
+        }
+        $result['data'] = $data;
+        return $this->json($result);
+    }
 }
