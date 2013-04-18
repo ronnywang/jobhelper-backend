@@ -60,7 +60,12 @@ class ApiController extends Pix_Controller
         // $url = strval($_GET['url']);
         $packages = array_unique(array_map('intval', explode(',', strval($_GET['packages']))));
 
-        $q = urlencode('(name:"' . $name . '")');
+        $terms = array();
+        // 處理 "宏達電 HTC Corporation_宏達國際電子股份有限公司"
+        foreach (explode('_', $name) as $parted_name) {
+            $terms[] = '(name:"' . $parted_name . '")';
+        }
+        $q = urlencode(implode(' OR ', $terms));
         $url = 'http://search-1.hisoku.ronny.tw:9200/jobhelper/_search?q=' . $q;
 
         $curl = curl_init();
