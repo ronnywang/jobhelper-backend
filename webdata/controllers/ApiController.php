@@ -53,6 +53,7 @@ class ApiController extends Pix_Controller
     public function searchAction()
     {
         $name = strval(trim($_GET['name']));
+        $start = microtime(true);
         if (mb_strlen($name, 'UTF-8') < 3) {
             return $this->json(array('error' => true, 'message' => '最少要三個字'));
         }
@@ -93,6 +94,7 @@ class ApiController extends Pix_Controller
             $data[] = $hit->_source;
         }
         $result['data'] = $data;
+        $result['took'] = microtime(true) - $start;
         return $this->json($result);
     }
 }
