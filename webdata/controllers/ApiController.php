@@ -52,7 +52,7 @@ class ApiController extends Pix_Controller
 
     public function searchAction()
     {
-        $name = strval($_GET['name']);
+        $name = strval(trim($_GET['name']));
         if (mb_strlen($name, 'UTF-8') < 3) {
             return $this->json(array('error' => true, 'message' => '最少要三個字'));
         }
@@ -63,7 +63,14 @@ class ApiController extends Pix_Controller
         $terms = array();
         // 處理 "宏達電 HTC Corporation_宏達國際電子股份有限公司"
         foreach (explode('_', $name) as $parted_name) {
-            $terms[] = '(name:"' . $parted_name . '")';
+            // 名稱假如包含公司但不是公司結尾, Ex: xxx公司xx廠
+            if (false !== strpos($parted_name, '公司') and !preg_match('#公司$#', $parted_name)) {
+                preg_match('#(.*公司)#', $parted_name, $matches);
+                $terms[] = '(name:"' . $matches[1] . '")';
+
+            } else {
+                $terms[] = '(name:"' . $parted_name . '")';
+            }
         }
         $q = urlencode(implode(' OR ', $terms));
         $url = 'http://search-1.hisoku.ronny.tw:9200/jobhelper/_search?q=' . $q;
