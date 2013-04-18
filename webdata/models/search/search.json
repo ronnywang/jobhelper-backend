@@ -1,0 +1,11 @@
+{
+    "mappings": {
+        "packages" : {
+            "properties" : {
+                "package_id" : {"type" : "integer"},
+                "name" : {"type" : "string", "null_value" : "na", "index" : "analyzed", "analyzer" : "cjk", "index_name" : "list_name"},
+                "date" : {"type" : "date"}
+            }
+        }
+    }
+}
