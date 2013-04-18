@@ -69,8 +69,8 @@ class ApiController extends Pix_Controller
                 $parted_name = preg_replace('#\([^)]*\)#', '', $parted_name);
             }
             // 名稱假如包含公司但不是公司結尾, Ex: xxx公司xx廠
-            if (false !== strpos($parted_name, '公司') and !preg_match('#公司$#', $parted_name)) {
-                preg_match('#(.*公司)#', $parted_name, $matches);
+            if (preg_match('#公司.+#', $parted_name)) {
+                preg_match('#(.*公司).+#', $parted_name, $matches);
                 $terms[] = '(name:"' . $matches[1] . '")';
 
             } else {
