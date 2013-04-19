@@ -16,7 +16,7 @@ class AuthOpenIDSessionStore extends Auth_OpenID_OpenIDStore {
         $serverKey = $this->associationServerKey($server_url);
         
         // get list of associations 
-        $serverAssociations = unserialize(Pix_Session::get($serverKey));
+        $serverAssociations = unserialize(DbSession::get($serverKey));
         
         // if no such list, initialize it with empty array
         if (!$serverAssociations) {
@@ -26,9 +26,9 @@ class AuthOpenIDSessionStore extends Auth_OpenID_OpenIDStore {
         $serverAssociations[$association->issued] = $associationKey;
         
         // save associations' keys list 
-        Pix_Session::set($serverKey, serialize($serverAssociations));
+        DbSession::set($serverKey, serialize($serverAssociations));
         // save association itself
-        Pix_Session::set($associationKey, serialize($association)); 
+        DbSession::set($associationKey, serialize($association)); 
     }
 
     /**
@@ -40,7 +40,7 @@ class AuthOpenIDSessionStore extends Auth_OpenID_OpenIDStore {
         // simple case: handle given
         if ($handle !== null) {
             // get association, return null if failed
-            $association = unserialize(Pix_Session::get(
+            $association = unserialize(DbSession::get(
                 $this->associationKey($server_url, $handle)));
             return $association ? $association : null;
         }
@@ -50,7 +50,7 @@ class AuthOpenIDSessionStore extends Auth_OpenID_OpenIDStore {
         $serverKey = $this->associationServerKey($server_url);
         
         // get list of associations
-        $serverAssociations = unserialize(Pix_Session::get($serverKey));
+        $serverAssociations = unserialize(DbSession::get($serverKey));
         // return null if failed or got empty list
         if (!$serverAssociations) {
             return null;
@@ -62,7 +62,7 @@ class AuthOpenIDSessionStore extends Auth_OpenID_OpenIDStore {
         $lastKey = $serverAssociations[array_pop($keys)];
         
         // get association, return null if failed
-        $association = unserialize(Pix_Session::get($lastKey));
+        $association = unserialize(DbSession::get($lastKey));
         return $association ? $association : null;
     }
 
@@ -78,7 +78,7 @@ class AuthOpenIDSessionStore extends Auth_OpenID_OpenIDStore {
             $handle);
         
         // get list of associations
-        $serverAssociations = unserialize(Pix_Session::get($serverKey));
+        $serverAssociations = unserialize(DbSession::get($serverKey));
         // return null if failed or got empty list
         if (!$serverAssociations) {
             return false;
@@ -95,13 +95,13 @@ class AuthOpenIDSessionStore extends Auth_OpenID_OpenIDStore {
         $serverAssociations = array_flip($serverAssociations);
 
         // save updated list
-        Pix_Session::set(
+        DbSession::set(
             $serverKey,
             serialize($serverAssociations)
         );
 
         // delete association 
-        return Pix_Session::delete($associationKey);
+        return DbSession::delete($associationKey);
     }
 
     /**
@@ -119,10 +119,10 @@ class AuthOpenIDSessionStore extends Auth_OpenID_OpenIDStore {
         
         // returns false when nonce already exists
         // otherwise adds nonce
-        if (Pix_Session::get('openid_nonce_' . sha1($server_url) . '_' . sha1($salt))) {
+        if (DbSession::get('openid_nonce_' . sha1($server_url) . '_' . sha1($salt))) {
             return false;
         }
-        Pix_Session::set(
+        DbSession::set(
             'openid_nonce_' . sha1($server_url) . '_' . sha1($salt), 
             1 // any value here 
         );
