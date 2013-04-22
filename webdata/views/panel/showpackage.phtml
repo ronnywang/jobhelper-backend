@@ -5,6 +5,8 @@
     名稱: <input type="text" name="name" value="<?= $this->escape($this->package->name) ?>"><br>
     說明: (請加入「資料來源」、「更新頻率」、「資訊取得方式」、「資料錯誤連絡方式」等資訊)<br>
     <textarea class="span12" name="note" cols="80" rows="6"><?= $this->escape($this->package->note) ?></textarea><br>
+    特別注意：（有填寫特別注意的話，這個資料包就會變成非預設，並且使用者需要看完注意事項並且同意才能使用資料包）<br>
+    <textarea class="span12" name="notice" cols="80" rows="6"><?= $this->escape($this->package->getEAV('notice')) ?></textarea><br>
     <?php foreach (array(0 => '線上', 1 => '測試') as $id => $name) { ?>
     <label><input type="radio" name="status" value="<?= $id ?>"<?= $id == $this->package->status ? ' checked="checked"' : '' ?>><?= $this->escape($name) ?></label>
     <?php } ?>

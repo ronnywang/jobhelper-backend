@@ -56,6 +56,7 @@ class PanelController extends Pix_Controller
             'note' => strval($_POST['note']),
             'status' => intval($_POST['status']),
         ));
+        $package->setEAV('notice', trim($_POST['notice']));
         return $this->alert('OK', '/panel/showpackage/' . $package->package_id);
     }
 
