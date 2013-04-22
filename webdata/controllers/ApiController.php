@@ -21,7 +21,13 @@ class ApiController extends Pix_Controller
             $package_info->url = 'http://' . $_SERVER['SERVER_NAME'] . '/package/show/' . $package->package_id;
             $package_info->updated_at = intval($package->updated_at);
             $package_info->package_time = intval($package->package_time);
-            $package_info->default = true;
+            if ($package->getEAV('notice')) {
+                $package_info->default = false;
+                $package_info->notice = strval($package->getEAV('notice'));
+            } else {
+                $package_info->default = true;
+                $package_info->notice = '';
+            }
             $packages[] = $package_info;
         }
         $ret->packages = $packages;
