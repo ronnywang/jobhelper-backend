@@ -2,6 +2,11 @@
 
 class PackageRow extends Pix_Table_Row
 {
+    public function getEAVs()
+    {
+        return EAV::search(array('table' => 'Package', 'id' => $this->package_id));
+    }
+
     public function updateToSearch()
     {
         // 先刪舊資料
@@ -104,5 +109,9 @@ class Package extends Pix_Table
         $this->_relations['content'] = array('rel' => 'has_one', 'type' => 'PackageContent', 'foreign_key' => 'package_id', 'delete' => true);
         $this->_relations['team'] = array('rel' => 'has_one', 'type' => 'Team', 'foreign_key' => 'team_id');
         $this->_relations['package_teams'] = array('rel' => 'has_many', 'type' => 'TeamPackage', 'foreign_key' => 'package_id', 'delete' => true);
+
+        $this->_hooks['eavs'] = array('get' => 'getEAVs');
+
+        $this->addRowHelper('Pix_Table_Helper_EAV', array('getEAV', 'setEAV'));
     }
 }
