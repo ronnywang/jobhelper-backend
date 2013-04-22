@@ -151,6 +151,7 @@ class PanelController extends Pix_Controller
         }
 
         $package->update(array('package_time' => time()));
+        $package->updateToSearch();
 
         return array('error' => false);
     }
