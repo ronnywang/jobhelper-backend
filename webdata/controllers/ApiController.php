@@ -58,6 +58,10 @@ class ApiController extends Pix_Controller
 
     public function searchAction()
     {
+        $m = new MemcacheSASL();
+        $m->addServer(getenv('MEMCACHE_SERVER'), getenv('MEMCACHE_PORT'));
+        $m->setSaslAuthData(getenv('MEMCACHE_USERNAME'), getenv('MEMCACHE_PASSWORD'));
+
         $name = strval(trim($_GET['name']));
         $start = microtime(true);
         if (mb_strlen($name, 'UTF-8') < 3) {
@@ -84,6 +88,14 @@ class ApiController extends Pix_Controller
             }
         }
         $q = urlencode(implode(' OR ', $terms));
+        $cache_key = 'SearchCache:' . crc32($q) . ':' . md5($q);
+        if ($data = $m->get($cache_key)) {
+            $result = array('error' => false, 'data' => json_decode($data));
+            $result['took'] = microtime(true) - $start;
+            $result['from_cache'] = true;
+            return $this->json($result);
+        }
+
         $url = 'http://search-1.hisoku.ronny.tw:9200/jobhelper/_search?q=' . $q;
 
         $curl = curl_init();
@@ -103,6 +115,7 @@ class ApiController extends Pix_Controller
             }
             $data[] = $hit->_source;
         }
+        $m->set($cache_key, json_encode($data));
         $result['data'] = $data;
         $result['took'] = microtime(true) - $start;
         return $this->json($result);
