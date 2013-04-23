@@ -75,24 +75,28 @@ class ApiController extends Pix_Controller
         // 處理 "宏達電 HTC Corporation_宏達國際電子股份有限公司"
         foreach (explode('_', $name) as $parted_name) {
             // 包含 (xxxxx), Ex: 台灣保全股份有限公司(總公司)
-            if (preg_match('#\([^)]*\)#', $parted_name)) {
+            if (preg_match('#\(([^)]*)\)#', $parted_name, $matches)) {
+                if (preg_match('#有限公司$#', $matches[1])) {
+                    $terms[] = '(name:"' . addslashes($matches[1]) . '")';
+                }
                 $parted_name = preg_replace('#\([^)]*\)#', '', $parted_name);
             }
             // 名稱假如包含公司但不是公司結尾, Ex: xxx公司xx廠
             if (preg_match('#公司.+#', $parted_name)) {
                 preg_match('#(.*公司).+#', $parted_name, $matches);
-                $terms[] = '(name:"' . $matches[1] . '")';
+                $terms[] = '(name:"' . addslashes($matches[1]) . '")';
 
             } else {
-                $terms[] = '(name:"' . $parted_name . '")';
+                $terms[] = '(name:"' . addslashes($parted_name) . '")';
             }
         }
         $q = urlencode(implode(' OR ', $terms));
         $cache_key = 'SearchCache:' . crc32($q) . ':' . md5($q);
-        if ($data = $m->get($cache_key)) {
+        if (!$_GET['force'] and $data = $m->get($cache_key)) {
             $result = array('error' => false, 'data' => json_decode($data));
             $result['took'] = microtime(true) - $start;
             $result['from_cache'] = true;
+            $result['query'] = urldecode($q);
             return $this->json($result);
         }
 
@@ -108,6 +112,7 @@ class ApiController extends Pix_Controller
         }
         $search_result = json_decode($content);
         $result = array('error' => false, 'data' => array());
+        $result['query'] = urldecode($q);
         $data = array();
         foreach ($search_result->hits->hits as $hit) {
             if (!in_array($hit->_source->package_id, $packages)) {
