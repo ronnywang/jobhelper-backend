@@ -91,7 +91,7 @@ class ApiController extends Pix_Controller
             }
         }
         $q = urlencode(implode(' OR ', $terms));
-        $cache_key = 'SearchCache:' . crc32($q) . ':' . md5($q);
+        $cache_key = 'SearchCache:' . crc32($q) . ':' . md5($q) . ':' . crc32(implode(',', $packages));
         if (!$_GET['force'] and $data = $m->get($cache_key)) {
             $result = array('error' => false, 'data' => json_decode($data));
             $result['took'] = microtime(true) - $start;
