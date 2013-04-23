@@ -115,7 +115,7 @@ class ApiController extends Pix_Controller
             }
             $data[] = $hit->_source;
         }
-        $m->set($cache_key, json_encode($data));
+        $m->set($cache_key, json_encode($data), 3600);
         $result['data'] = $data;
         $result['took'] = microtime(true) - $start;
         return $this->json($result);
