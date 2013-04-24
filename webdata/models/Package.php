@@ -44,7 +44,7 @@ class PackageRow extends Pix_Table_Row
 
         if (count($requests)) {
             $curl = curl_init();
-            $url = getenv('SEARCH_URL') . '/jobhelper/_bulk';
+            $url = getenv('SEARCH_URL') . '/jobhelper/_bulk?refresh=true';
             curl_setopt($curl, CURLOPT_URL, $url);
             curl_setopt($curl, CURLOPT_HEADER, 0);
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
