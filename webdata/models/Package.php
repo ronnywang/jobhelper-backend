@@ -49,7 +49,7 @@ class PackageRow extends Pix_Table_Row
             curl_setopt($curl, CURLOPT_HEADER, 0);
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PUT');
-            curl_setopt($curl, CURLOPT_POSTFIELDS, implode("\n", $requests));
+            curl_setopt($curl, CURLOPT_POSTFIELDS, implode("\n", $requests) . "\n");
             $ret = curl_exec($curl);
         }
     }
