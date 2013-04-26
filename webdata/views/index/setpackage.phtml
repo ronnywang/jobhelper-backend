@@ -39,7 +39,20 @@ $('#packages').on('change', 'input:checkbox', function(){
     choosed_packages = [];
     $('#packages input:checkbox').each(function(){
         var self = $(this);
-        choosed_packages[parseInt(self.data('package_id'))] = self.is(':checked');
+        if (self.is(':checked')) {
+            choosed_packages[self.data('package_id')] = true;
+            if (self.data('notice')) {
+                // 顯示此資料包提示訊息
+                self.parents('li').append($('<div></div>').addClass('alert').addClass('alert-info').text(self.data('notice')));
+                var div_dom = self.parents('li').find('div.alert');
+                if (div_dom.offset().top + div_dom.height() > $(window).height() + $(window).scrollTop()) {
+                    $(window).scrollTop(div_dom.offset().top + div_dom.height() - $(window).height() + 50);
+                }
+            }
+        } else {
+            choosed_packages[self.data('package_id')] = false;
+            self.parents('li').find('div.alert').remove();
+        }
     });
     setCookie('choosed_packages', JSON.stringify(choosed_packages));
 });
