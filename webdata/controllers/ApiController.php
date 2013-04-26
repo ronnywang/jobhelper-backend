@@ -76,7 +76,11 @@ class ApiController extends Pix_Controller
                 $has_notices[$eav->id] = $eav->value;
             };
 
-            if (!$_COOKIE['choosed_packages'] and !$json = json_decode($_COOKIE['choosed_packages']) and !is_array($json)) {
+            if (!$_COOKIE['choosed_packages']) {
+                $cookie_settings = array();
+            } elseif (!$json = json_decode($_COOKIE['choosed_packages'])) {
+                $cookie_settings = array();
+            } elseif (!is_array($json)) {
                 $cookie_settings = array();
             } else {
                 $cookie_settings = $json;
@@ -93,6 +97,8 @@ class ApiController extends Pix_Controller
                     $packages[] = $id;
                 }
             }
+            var_dump($packages);
+            exit;
         } else {
             $packages = array_unique(array_map('intval', explode(',', strval($_GET['packages']))));
         }
