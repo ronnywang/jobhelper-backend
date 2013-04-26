@@ -97,8 +97,6 @@ class ApiController extends Pix_Controller
                     $packages[] = $id;
                 }
             }
-            var_dump($packages);
-            exit;
         } else {
             $packages = array_unique(array_map('intval', explode(',', strval($_GET['packages']))));
         }
