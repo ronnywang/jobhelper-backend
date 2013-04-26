@@ -91,7 +91,7 @@ class ApiController extends Pix_Controller
             }
         }
         $q = urlencode(implode(' OR ', $terms));
-        $v = '2013042600';
+        $v = '2013042601';
         $cache_key = 'SearchCache:' . crc32($q) . ':' . md5($q) . ':' . crc32(implode(',', $packages)) . ':' . $v;
         if (!$_GET['force'] and $data = $m->get($cache_key)) {
             $result = array('error' => false, 'data' => json_decode($data));
@@ -101,7 +101,7 @@ class ApiController extends Pix_Controller
             return $this->json($result);
         }
 
-        $url = 'http://search-1.hisoku.ronny.tw:9200/jobhelper/_search?q=' . $q . '&size=100';
+        $url = 'http://search-1.hisoku.ronny.tw:9200/jobhelper/_search?q=' . $q . '&size=200';
 
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);
