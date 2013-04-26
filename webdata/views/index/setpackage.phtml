@@ -1,0 +1,82 @@
+<?= $this->partial('/common/header.phtml', $this) ?>
+<h1>設定需要的資料包</h1>
+<ul id="packages">
+</ul>
+<script>
+var choosed_packages;
+try {
+    choosed_packages = JSON.parse(getCookie('choosed_packages'));
+} catch (e){ 
+    choosed_packages = [];
+}
+
+if (null === choosed_packages || 'undefined' == typeof(choosed_packages.length)) {
+    choosed_packages = [];
+}
+
+$.get('/api/getpackages', function(res){
+    var packages = res.packages;
+    for (var i = 0; i < packages.length;i ++) {
+        var pack = packages[i];
+        var label_dom = $('<label></label>');
+        var li_dom = $('<li></li>');
+        var input_dom = $('<input type="checkbox">').data('package_id', pack.id);
+        input_dom.data('notice', pack.notice);
+        if ('undefined' != typeof(choosed_packages[parseInt(pack.id)])) {
+            if (choosed_packages[parseInt(pack.id)]) {
+                input_dom.prop('checked', true);
+            }
+        } else if (!pack.notice) {
+            input_dom.prop('checked', true);
+        }
+        label_dom.append(input_dom).append($('<span></span>').text(pack.name));
+        li_dom.append(label_dom);
+        $('#packages').append(li_dom);
+    }
+}, 'json');
+
+$('#packages').on('change', 'input:checkbox', function(){
+    choosed_packages = [];
+    $('#packages input:checkbox').each(function(){
+        var self = $(this);
+        choosed_packages[parseInt(self.data('package_id'))] = self.is(':checked');
+    });
+    setCookie('choosed_packages', JSON.stringify(choosed_packages));
+});
+
+// from http://www.w3schools.com/js/js_cookies.asp
+function setCookie(c_name,value,exdays)
+{
+    var exdate=new Date();
+    exdate.setDate(exdate.getDate() + exdays);
+    var c_value=escape(value) + ((exdays==null) ? "" : "; expires="+exdate.toUTCString()) + '; path=/';
+    document.cookie=c_name + "=" + c_value;
+}
+
+function getCookie(c_name)
+{
+    var c_value = document.cookie;
+    var c_start = c_value.indexOf(" " + c_name + "=");
+    if (c_start == -1)
+    {
+        c_start = c_value.indexOf(c_name + "=");
+    }
+    if (c_start == -1)
+    {
+        c_value = null;
+    }
+    else
+    {
+        c_start = c_value.indexOf("=", c_start) + 1;
+        var c_end = c_value.indexOf(";", c_start);
+        if (c_end == -1)
+        {
+            c_end = c_value.length;
+        }
+        c_value = unescape(c_value.substring(c_start,c_end));
+    }
+    return c_value;
+}
+
+</script>
+<?= $this->partial('/common/footer.phtml', $this) ?>

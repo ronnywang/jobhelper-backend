@@ -28,4 +28,8 @@ class IndexController extends Pix_Controller
     {
         header('Content-Type: text/csv');
     }
+
+    public function setpackageAction()
+    {
+    }
 }
