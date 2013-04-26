@@ -69,7 +69,33 @@ class ApiController extends Pix_Controller
         }
         // url 備用
         // $url = strval($_GET['url']);
-        $packages = array_unique(array_map('intval', explode(',', strval($_GET['packages']))));
+        if ($_GET['packages'] == 'cookie') {
+            $online_package_status = Package::search(1)->toArray('status');
+            $has_notices = array();
+            foreach (EAV::search(array('table' => 'Package', 'key' => 'notice'))->searchIn('id', $online_package_ids) as $eav) {
+                $has_notices[$eav->id] = $eav->value;
+            };
+
+            if (!$_COOKIE['choosed_packages'] and !$json = json_decode($_COOKIE['choosed_packages']) and !is_array($json)) {
+                $cookie_settings = array();
+            } else {
+                $cookie_settings = $json;
+            }
+
+            $packages = array();
+            foreach ($online_package_status as $id => $status) {
+                if (array_key_exists($id, $cookie_settings)) { // 如果 cookie 有指定以 cookie 最優先
+                    if ($cookie_settings[$id]) {
+                        $packages[] = $id;
+                    }
+                } elseif (array_key_exists($id, $has_notices) and $has_notices[$id]) { // 有 notice 就不要預設
+                } elseif ($status == 0) {
+                    $packages[] = $id;
+                }
+            }
+        } else {
+            $packages = array_unique(array_map('intval', explode(',', strval($_GET['packages']))));
+        }
 
         $terms = array();
         // 處理 "宏達電 HTC Corporation_宏達國際電子股份有限公司"
