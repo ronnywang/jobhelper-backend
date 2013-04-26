@@ -33,7 +33,7 @@ class ApiController extends Pix_Controller
         $ret->packages = $packages;
         $ret->error = false;
 
-        return $this->json($ret);
+        return $this->jsonp($ret, $_GET['callback']);
     }
 
     public function getpackageAction()
@@ -43,7 +43,7 @@ class ApiController extends Pix_Controller
         if (!$package = Package::find(intval($_GET['id']))) {
             $ret->error = true;
             $ret->message = '找不到這個資料包';
-            return $this->json($ret);
+            return $this->jsonp($ret, $_GET['callback']);
         }
 
         $ret->package_time = intval($package->package_time);
@@ -53,7 +53,7 @@ class ApiController extends Pix_Controller
             $rows[] = str_getcsv($line);
         }
         $ret->content = $rows;
-        return $this->json($ret);
+        return $this->jsonp($ret, $_GET['callback']);
     }
 
     public function searchAction()
@@ -65,7 +65,7 @@ class ApiController extends Pix_Controller
         $name = strval(trim($_GET['name']));
         $start = microtime(true);
         if (mb_strlen($name, 'UTF-8') < 3) {
-            return $this->json(array('error' => true, 'message' => '最少要三個字'));
+            return $this->jsonp(array('error' => true, 'message' => '最少要三個字'), $_GET['callback']);
         }
         // url 備用
         // $url = strval($_GET['url']);
@@ -128,7 +128,7 @@ class ApiController extends Pix_Controller
             $result['took'] = microtime(true) - $start;
             $result['from_cache'] = true;
             $result['query'] = urldecode($q);
-            return $this->json($result);
+            return $this->jsonp($result, $_GET['callback']);
         }
 
         $url = 'http://search-1.hisoku.ronny.tw:9200/jobhelper/_search?q=' . $q . '&size=200';
@@ -139,7 +139,7 @@ class ApiController extends Pix_Controller
         $content = curl_exec($curl);
         $info = curl_getinfo($curl);
         if ($info['http_code'] != 200) {
-            return $this->json(array('error' => true, 'message' => '搜尋出問題'));
+            return $this->jsonp(array('error' => true, 'message' => '搜尋出問題'), $_GET['callback']);
         }
         $search_result = json_decode($content);
         $result = array('error' => false, 'data' => array());
@@ -154,6 +154,6 @@ class ApiController extends Pix_Controller
         $m->set($cache_key, json_encode($data), 3600);
         $result['data'] = $data;
         $result['took'] = microtime(true) - $start;
-        return $this->json($result);
+        return $this->jsonp($result, $_GET['callback']);
     }
 }
