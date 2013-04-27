@@ -22,7 +22,7 @@ $.get('/api/getpackages', function(res){
         var li_dom = $('<li></li>');
         var input_dom = $('<input type="checkbox">').data('package_id', pack.id);
         input_dom.data('notice', pack.notice);
-        if ('undefined' != typeof(choosed_packages[parseInt(pack.id)])) {
+        if ('undefined' != typeof(choosed_packages[parseInt(pack.id)]) && null !== choosed_packages[pack.id]) {
             if (choosed_packages[parseInt(pack.id)]) {
                 input_dom.prop('checked', true);
             }
@@ -36,24 +36,21 @@ $.get('/api/getpackages', function(res){
 }, 'json');
 
 $('#packages').on('change', 'input:checkbox', function(){
-    choosed_packages = [];
-    $('#packages input:checkbox').each(function(){
-        var self = $(this);
-        if (self.is(':checked')) {
-            choosed_packages[self.data('package_id')] = true;
-            if (self.data('notice')) {
-                // 顯示此資料包提示訊息
-                self.parents('li').append($('<div></div>').addClass('alert').addClass('alert-info').text(self.data('notice')));
-                var div_dom = self.parents('li').find('div.alert');
-                if (div_dom.offset().top + div_dom.height() > $(window).height() + $(window).scrollTop()) {
-                    $(window).scrollTop(div_dom.offset().top + div_dom.height() - $(window).height() + 50);
-                }
+    var self = $(this);
+    if (self.is(':checked')) {
+        choosed_packages[self.data('package_id')] = true;
+        if (self.data('notice')) {
+            // 顯示此資料包提示訊息
+            self.parents('li').append($('<div></div>').addClass('alert').addClass('alert-info').text(self.data('notice')));
+            var div_dom = self.parents('li').find('div.alert');
+            if (div_dom.offset().top + div_dom.height() > $(window).height() + $(window).scrollTop()) {
+                $(window).scrollTop(div_dom.offset().top + div_dom.height() - $(window).height() + 50);
             }
-        } else {
-            choosed_packages[self.data('package_id')] = false;
-            self.parents('li').find('div.alert').remove();
         }
-    });
+    } else {
+        choosed_packages[self.data('package_id')] = false;
+        self.parents('li').find('div.alert').remove();
+    }
     setCookie('choosed_packages', JSON.stringify(choosed_packages), 365);
 });
 

@@ -88,7 +88,7 @@ class ApiController extends Pix_Controller
 
             $packages = array();
             foreach ($online_package_status as $id => $status) {
-                if (array_key_exists($id, $cookie_settings)) { // 如果 cookie 有指定以 cookie 最優先
+                if (array_key_exists($id, $cookie_settings) and !is_null($cookie_settings[$id])) { // 如果 cookie 有指定以 cookie 最優先
                     if ($cookie_settings[$id]) {
                         $packages[] = $id;
                     }
