@@ -54,7 +54,7 @@ $('#packages').on('change', 'input:checkbox', function(){
             self.parents('li').find('div.alert').remove();
         }
     });
-    setCookie('choosed_packages', JSON.stringify(choosed_packages));
+    setCookie('choosed_packages', JSON.stringify(choosed_packages), 365);
 });
 
 // from http://www.w3schools.com/js/js_cookies.asp
