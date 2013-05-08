@@ -64,8 +64,8 @@ class ApiController extends Pix_Controller
 
         $name = strval(trim($_GET['name']));
         $start = microtime(true);
-        if (mb_strlen($name, 'UTF-8') < 3) {
-            return $this->jsonp(array('error' => true, 'message' => '最少要三個字'), $_GET['callback']);
+        if (mb_strlen($name, 'UTF-8') < 2) {
+            return $this->jsonp(array('error' => true, 'message' => '最少要兩個字'), $_GET['callback']);
         }
         // url 備用
         // $url = strval($_GET['url']);
