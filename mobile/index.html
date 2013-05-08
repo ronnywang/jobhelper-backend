@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html manifest="jobhelper.manifest">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <link rel="apple-touch-icon" href="sandwich-128.png" />
+        <link rel="apple-touch-startup-image" href="sandwich-128.png" />
+	<title>求職小幫手 - 手機版</title>
+	<link rel="stylesheet"  href="css/themes/default/jquery.mobile-1.3.1.min.css">
+ 	<script src="js/jquery.js"></script>
+	<script src="js/jquery.mobile-1.3.1.min.js"></script>
+	<script src="js/jquery.json-2.4.min.js"></script>
+	<script src="js/jquery.cookie.js"></script>
+	<script src="js/jquery.storage.js"></script>
+	<style type="text/css">
+	.data_item{padding-bottom: 10px;}
+	.data_reason{padding-top: 5px;padding-left: 10px;}
+	.data_date{color:#0e1fff;}
+	.data_name{color:#e13f4c;font-weight:bold;font-size:1.1em;text-align:center;padding-bottom:5px;}
+	</style>
+        <script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', "UA-36564593-5"]);
+_gaq.push(['_trackPageview']);
+
+(function() {
+     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+         ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+             var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+             })();
+        </script>
+</head>
+<body>
+<div data-role="page">
+    <div data-role="header">
+        <h1>求職小幫手 - 手機版</h1>
+       <div data-role="navbar">
+            <ul>
+                <li><a href="#" data-icon="search" class="change_content ui-btn-active">搜尋</a></li>
+                <li><a href="#" data-icon="gear" class="change_content">設定</a></li>
+            </ul>
+        </div><!-- /navbar -->
+    </div>
+	<div data-role="content" id="search_content">
+        <input type="text" name="textinput-hide" id="comp_name" placeholder="公司名稱" value="">
+        <button data-icon="search" id="search_btn">搜尋</button>
+		<div data-role="collapsible" data-theme="b" data-content-theme="d" id="result" style="display:none;padding-top:20px;">
+			<h4>搜尋結果&nbsp;<span id="data_count" class="ui-li-count ui-btn-up-c ui-btn-corner-all"></span></h4>
+			<div id="result_data"></div>
+		</div>
+	</div>
+	<div data-role="content" id="setting_content" style="display:none;">
+        <fieldset data-role="controlgroup" id="pkg_list">
+            <legend>選擇要搜尋的資料包</legend>
+       </fieldset>
+	</div>
+	
+</div>
+
+<script type="text/javascript">
+// 顯示訊息框
+// https://gist.github.com/kamranzafar/3136584
+var create_msg=function(msg){
+	$("<div class='ui-loader ui-overlay-shadow ui-body-e ui-corner-all'><h3>"+msg+"</h3></div>")
+	.css({ display: "block", 
+		opacity: 0.90, 
+		position: "fixed",
+		padding: "7px",
+		"text-align": "center",
+		width: "270px",
+		left: ($(window).width() - 284)/2,
+		top: $(window).height()/2 -60 })
+	.appendTo( $.mobile.pageContainer ).delay( 3500 )
+	.fadeOut( 400, function(){
+		$(this).remove();
+	});
+};
+
+//建立設定頁面的資料包列表
+var pkg_notice={};
+var pkg_name={};
+var mypkg=jQuery.localStorage('mypkg')!==null ? $.evalJSON(jQuery.localStorage('mypkg')) : {};
+
+var create_pkg_list=function(list){
+	var pkg_list=$('#pkg_list .ui-controlgroup-controls');
+	for(var item in list.packages){
+		pkg_name[list.packages[item].id]=list.packages[item].name
+		var box=$('<input />').attr('type','checkbox').attr('id','check_pkg_'+list.packages[item].id);
+		if(list.packages[item]['default']==true){
+			box.attr('checked',true);
+		}
+		if(mypkg[list.packages[item].id]!==undefined){
+			box.attr('checked',mypkg[list.packages[item].id]);
+		}
+
+		//處理資料包的備註
+		if(list.packages[item].notice!==''){
+			pkg_notice['check_pkg_'+list.packages[item].id]=list.packages[item].notice;
+			box.change(function(){
+				var id=$(this).attr('id');
+				if($(this).is(':checked')==true){
+					alert(pkg_notice[id]);
+				}
+			});
+		}
+
+		var label=$('<label>'+list.packages[item].name+'</label>').attr('for','check_pkg_'+list.packages[item].id);
+		pkg_list.append(box).append(label).trigger("create");
+	}
+
+	//列表頭尾的圓角外框
+	$('#pkg_list .ui-controlgroup-controls label :first').addClass('ui-first-child');
+	$('#pkg_list .ui-controlgroup-controls label :last').addClass('ui-last-child');
+	bind_box_change();
+};
+
+//變動資料包選項
+var bind_box_change=function(){
+	$('#pkg_list input[type=checkbox]').change(function(){
+		var list={};
+		$('#pkg_list input[type=checkbox]').each(function(index){
+			var id=$(this).attr('id').split('_')[2];
+			var v=$(this).is(':checked');
+			list[id]=v;
+		});
+		jQuery.localStorage('mypkg',$.toJSON(list));
+	});
+};
+
+//載入資料包
+var load_pkg_list=function(){
+	$.mobile.loading( 'show', {text: "載入資料包列表...請稍候",textVisible: true,theme: 'a'});
+	$(this).attr('disabled','');
+	$.ajax({
+		type:'GET',
+		url:'http://jobhelper.g0v.ronny.tw/api/getpackages',
+		dataType:'JSONP',
+		timeout:5000,
+		success:function(data){
+			create_pkg_list(data);
+			rm_search_lock();
+		},
+		error:function(){
+			rm_search_lock();
+			create_msg('無法取得資料包列表，請檢查您的網路連線或稍候再試。');
+		}
+	});
+};
+
+//取得選用的資料包
+var get_pkg_list=function(){
+	var list='';
+	$('#pkg_list input[type=checkbox]:checked').each(function(index){
+		var id=$(this).attr('id').split('_')[2];
+		list+=id+',';
+	});
+	return list;
+};
+
+//顯示查詢結果
+var show_data=function(data){
+	var output=$('#result_data');
+	$('#result_data *').remove();
+	$('#result').css('display','block');
+	if(data.error==true){
+		output.append('<h3>錯誤：'+data.message+'</h3>');
+		return;
+	}
+
+	data=data.data;
+	$('#data_count').text(data.length);
+	var title='';
+	for(var i in data){
+		var item=data[i];
+		var title_html='';
+		if(item.name!==title){
+			if(title!==''){
+				title_html='<hr />';
+			}
+			title=item.name;
+			title_html+='<div class="data_name">'+title+'</div>';
+		}
+		var d=$(title_html+'<div class="data_item"><span class="data_date">'+item.date+'</span>&nbsp;-&nbsp;'+pkg_name[item.package_id]+'<br /><div class="data_reason">'+item.reason+'</div></div>');
+		output.append(d);
+	}
+
+	if(data.length==0){
+		output.append('<h3>找不到任何結果</h3>');
+	}
+}
+
+var rm_search_lock=function(){
+	$.mobile.loading('hide');
+	$('#search_btn').removeAttr('disabled');
+}
+
+$(document).ready(function(){
+	load_pkg_list();
+
+	//頁籤切換
+	$('.change_content').click(function(){
+		var item=$(this).attr('data-icon');
+		if(item=='search'){
+			$('#search_content').css('display','block');
+			$('#setting_content').css('display','none');
+		}else{
+			$('#search_content').css('display','none');
+			$('#setting_content').css('display','block');	
+		}
+	});
+
+	 //搜尋
+	$('#search_btn').click(function(){
+		var pkg_list=get_pkg_list();
+		var comp_name=$('#comp_name').val();
+		if(comp_name.length<2){
+			create_msg('最少要輸入兩個字');
+			return;
+		}
+
+		if(pkg_list==''){
+			load_pkg_list();
+			return;
+		}
+
+		$.mobile.loading( 'show', {text: "搜尋中...",textVisible: true,theme: 'a'});
+		$(this).attr('disabled','');
+
+		$.ajax({
+			type:'GET',
+			url:'http://jobhelper.g0v.ronny.tw/api/search?name='+comp_name+'&packages='+pkg_list,
+			dataType:'JSONP',
+			timeout:5000,
+			success:function(data){
+				show_data(data);
+				rm_search_lock();
+			},
+			error:function(xhr, ajaxOptions, thrownError){
+				create_msg('搜尋失敗，請檢查您的網路連線或稍候再試。');
+				rm_search_lock();
+			}
+		});
+	});
+});
+</script>
+</body>
+</html>

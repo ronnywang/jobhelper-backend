@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+    <widget xmlns = "http://www.w3.org/ns/widgets"
+        xmlns:gap = "http://phonegap.com/ns/1.0"
+        id        = "com.g0v.jobhelper"
+        versionCode="12"
+        version   = "1.0.2">
+
+    <!-- versionCode is optional and Android only -->
+
+    <name>求職小幫手</name>
+
+    <description>
+        求職小幫手App版本 
+    </description>
+
+    <author href="https://github.com/nansenat16/jobhelper-mobile" email="nansen.su@null.tw">
+        Nansen Su 
+    </author>
+
+    <gap:platforms>
+        <gap:platform name="android" minVersion="2.1" />
+    </gap:platforms>
+
+    <icon src="./images/icon.png" />
+    <preference name="permissions" value="none"/>
+    <preference name="target-device" value="handset" />
+    <access origin="http://jobhelper.g0v.ronny.tw" />
+</widget>
