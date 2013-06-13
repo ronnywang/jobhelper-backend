@@ -58,9 +58,9 @@ class ApiController extends Pix_Controller
 
     public function searchAction()
     {
-        $m = new MemcacheSASL();
+        /*$m = new MemcacheSASL();
         $m->addServer(getenv('MEMCACHE_SERVER'), getenv('MEMCACHE_PORT'));
-        $m->setSaslAuthData(getenv('MEMCACHE_USERNAME'), getenv('MEMCACHE_PASSWORD'));
+        $m->setSaslAuthData(getenv('MEMCACHE_USERNAME'), getenv('MEMCACHE_PASSWORD'));*/
 
         $name = strval(trim($_GET['name']));
         $start = microtime(true);
@@ -123,8 +123,8 @@ class ApiController extends Pix_Controller
         $q = urlencode(implode(' OR ', $terms));
         $v = '2013042601';
         $cache_key = 'SearchCache:' . crc32($q) . ':' . md5($q) . ':' . crc32(implode(',', $packages)) . ':' . $v;
-        if (!$_GET['force'] and $data = $m->get($cache_key)) {
-            $result = array('error' => false, 'data' => json_decode($data));
+        if (!$_GET['force'] and $row = Cache::find(md5($cache_key)) and $row->updated_at > time() - 3600) {
+            $result = array('error' => false, 'data' => json_decode($row->value));
             $result['took'] = microtime(true) - $start;
             $result['from_cache'] = true;
             $result['query'] = urldecode($q);
@@ -151,7 +151,20 @@ class ApiController extends Pix_Controller
             }
             $data[] = $hit->_source;
         }
-        $m->set($cache_key, json_encode($data), 3600);
+        try {
+            Cache::insert(array(
+                'key' => md5($cache_key),
+                'value' => json_encode($data),
+                'updated_at' => time(),
+            ));
+        } catch (Pix_Table_DuplcateException $e) {
+            Cache::search(array(
+                'key' => md5($cache_key),
+            ))->update(array(
+                'value' => json_encode($data),
+                'updated_at' => time(),
+            ));
+        }
         $result['data'] = $data;
         $result['took'] = microtime(true) - $start;
         return $this->jsonp($result, $_GET['callback']);
