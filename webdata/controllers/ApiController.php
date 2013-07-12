@@ -157,7 +157,7 @@ class ApiController extends Pix_Controller
                 'value' => json_encode($data),
                 'updated_at' => time(),
             ));
-        } catch (Pix_Table_DuplcateException $e) {
+        } catch (Pix_Table_DuplicateException $e) {
             Cache::search(array(
                 'key' => md5($cache_key),
             ))->update(array(
