@@ -136,6 +136,7 @@ class ApiController extends Pix_Controller
 
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_TIMEOUT, 10);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         $content = curl_exec($curl);
         $info = curl_getinfo($curl);
