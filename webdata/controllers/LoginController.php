@@ -2,35 +2,29 @@
 
 class LoginController extends Pix_Controller
 {
-    protected function getGoogleConsumer()
-    {
-        set_include_path(get_include_path() . PATH_SEPARATOR . __DIR__ . '/../stdlibs/php-openid');
-        include(__DIR__ . '/../stdlibs/php-openid/Auth/OpenID/Consumer.php');
-        include(__DIR__ . '/../stdlibs/php-openid/Auth/OpenID/AX.php');
-        include(__DIR__ . '/../stdlibs/php-openid/Auth/OpenID/PAPE.php');
-        include(__DIR__ . '/../stdlibs/php-openid/Auth/OpenID/Interface.php');
-
-        $store = new AuthOpenIDSessionStore();
-        $consumer = new Auth_OpenID_Consumer($store);
-        return $consumer;
-    }
-
     public function googledoneAction()
     {
-        $consumer = $this->getGoogleConsumer();
-        $return_to = 'http://' . $_SERVER['SERVER_NAME'] . '/login/googledone';
-        $response = $consumer->complete($return_to);
+        $return_to = 'https://' . $_SERVER['HTTP_HOST'] . '/login/googledone';
 
-        if ($response->status == Auth_OpenID_CANCEL) {
-            return $this->alert('取消登入', '/');
+        $params = array();
+        $params[] = 'code=' . urlencode($_GET['code']);
+        $params[] = 'client_id=' . urlencode(getenv('GOOGLE_CLIENT_ID'));
+        $params[] = 'client_secret=' . urlencode(getenv('GOOGLE_CLIENT_SECRET'));
+        $params[] = 'redirect_uri=' . urlencode($return_to);
+        $params[] = 'grant_type=authorization_code';
+        $curl = curl_init('https://www.googleapis.com/oauth2/v3/token');
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, implode('&', $params));
+        $obj = json_decode(curl_exec($curl));
+        if (!$obj->id_token) {
+            return $this->alert('login failed', '/');
         }
-        if ($response->status == Auth_OpenID_FAILURE) {
-            return $this->alert('登入失敗: ' . $response->message, '/');
+        $tokens = explode('.', $obj->id_token);
+        $login_info = json_decode(base64_decode($tokens[1]));
+        if (!$login_info->email or !$login_info->email_verified) {
+            return $this->alert('login failed', '/');
         }
-
-        $ax = new Auth_OpenID_AX_FetchResponse();
-        $obj = $ax->fromSuccessResponse($response);
-        $email = $obj->data['http://axschema.org/contact/email'][0];
+        $email = $login_info->email;
 
         if (!$user = User::search(array('user_name' => 'google://' . $email))->first()) {
             return $this->alert('您不在管理名單中', '/');
@@ -41,33 +35,15 @@ class LoginController extends Pix_Controller
 
     public function googleAction()
     {
-        $consumer = $this->getGoogleConsumer();
-        $url = 'https://www.google.com/accounts/o8/id';
-        $auth_request = $consumer->begin($url);
-
-        if (!$auth_request) {
-            return $this->alert('Authentication error, not a valid OpenID', '/');
-        }
-
-        $ax = new Auth_OpenID_AX_FetchRequest;
-        $ax->add(Auth_OpenID_AX_AttrInfo::make('http://axschema.org/contact/email',2,1, 'email'));
-        $auth_request->addExtension($ax);
-
-        $pape_request = new Auth_OpenID_PAPE_Request(null);
-        $auth_request->addExtension($pape_request);
-
-        $form_id = 'openid_message';
-        $form_html = $auth_request->htmlMarkup('http://' . $_SERVER['SERVER_NAME'], 'http://' . $_SERVER['SERVER_NAME'] . '/login/googledone',
-                                               false, array('id' => $form_id));
-
-        // Display an error if the form markup couldn't be generated;
-        // otherwise, render the HTML.
-        if (Auth_OpenID::isFailure($form_html)) {
-            $this->alert("Could not redirect to server: " . $form_html->message, '/');
-        } else {
-            print $form_html;
-            return $this->noview();
-        }
+        $return_to = 'https://' . $_SERVER['HTTP_HOST'] . '/login/googledone';
+        $url = 'https://accounts.google.com/o/oauth2/auth?'
+            . '&state='
+            . '&scope=email'
+            . '&redirect_uri=' . urlencode($return_to)
+            . '&response_type=code'
+            . '&client_id=' . getenv('GOOGLE_CLIENT_ID')
+            . '&access_type=offline';
+        return $this->redirect($url);
     }
 
     public function logoutAction()
