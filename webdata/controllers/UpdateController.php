@@ -2,6 +2,11 @@
 
 class UpdateController extends Pix_Controller
 {
+    public function init()
+    {
+        $this->view->user = ($user_id = Pix_Session::get('user_id')) ? User::find(intval($user_id)) : null;
+    }
+
     public function indexAction()
     {
     }
