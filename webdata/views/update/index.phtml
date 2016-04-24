@@ -82,17 +82,35 @@ $('#add-data-form input[name="county"]').keyup(function(){
     unique_county = unique_county.filter(function(c) { return c.indexOf(input) != -1; });
     $('#county-hint').html(unique_county.map(function(c) { return $('<span></span>').append($('<span></span>').text(c).addClass('group')).html(); }).join(','));
 }).change(function(){
-
     var county = $('#add-data-form input[name="county"]').val();
-    titles = records
+    $('#title-hint').text(county + "的標題記錄: ");
+    records
         .filter(function(r) { return r.data.county == county; })
         .sort(function(a,b) { return b.data.published_at - a.data.published_at; })
+        .slice(0, 5)
         .map(function(r) {
-            p = new Date(r.data.published_at * 1000);
-            return '(' + p.getFullYear() + '/' + (p.getMonth() + 1) + '/' + p.getDate() + ')' + r.data.data_title;
+            var span_dom = $('<span></span>');
+            var p = new Date(r.data.published_at * 1000);
+            span_dom.text('(' + p.getFullYear() + '/' + (p.getMonth() + 1) + '/' + p.getDate() + ')');
+            span_dom.append($('<a></a>').text(r.data.data_title));
+            span_dom.data('record', r.data);
+            span_dom.addClass('title-record');
+            return span_dom;
         })
-        .slice(0, 5);
-    $('#title-hint').text(county + "的標題記錄: " + titles.join(','));
+        .map(function(d) {
+            $('#title-hint').append(d);
+        });
+        });
+
+$('#title-hint').on('click', '.title-record', function(e){
+    e.preventDefault();
+    var record = $(this).data('record');
+    $('#add-data-form input[name="county"]').val(record.county);
+    $('#add-data-form input[name="title"]').val(record.data_title);
+    p = new Date(record.published_at * 1000);
+    $('#add-data-form input[name="published_at"]').val(p.getFullYear() + '/' + (p.getMonth() + 1) + '/' + p.getDate());
+    $('#add-data-form input[name="url"]').val(record.url);
+    $('#add-data-form input[name="other"]').val(record.other);
 });
 
 
