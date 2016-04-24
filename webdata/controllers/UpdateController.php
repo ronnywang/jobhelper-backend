@@ -14,7 +14,11 @@ class UpdateController extends Pix_Controller
     public function listAction()
     {
         return $this->json(
-            array_values(array_map(function($r) { $r['data'] = json_decode($r['data']); return $r; }, DataSet::search(1)->toArray(array('id', 'data'))))
+            array_values(array_map(function($r) {
+                $r['data'] = json_decode($r['data']);
+                $r['data']->county = str_replace('台', '臺', $r['data']->county);
+                return $r;
+            }, DataSet::search(1)->toArray(array('id', 'data'))))
         );
     }
 
