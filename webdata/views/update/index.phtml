@@ -38,14 +38,36 @@ $('#checkurl-form').submit(function(e){
 <h1>更新確認手</h1>
 有新資料就來這邊登錄，讓後面可以接著截圖和資料整理
 <form method="post" action="/update/adddataset" id="add-data-form">
+    <input type="hidden" name="sToken" value="<?= $this->sToken ?>">
     縣市或分類: <input type="text" name="county" class="group-input"><span id="county-hint"></span><br>
     標題: <input type="text" name="title"><span id="title-hint"></span><br>
     上架時間: <input type="text" name="published_at"><br>
     網址: <input type="text" name="url"><br>
     其他: <textarea name="other"></textarea>
     <button type="submit">送出</button>
+    <div id="add-data-result"></div>
 </form>
 <script>
+$('#add-data-form').submit(function(e){
+    e.preventDefault();
+    var formdata = new FormData(this);
+
+    $.ajax({
+        url: $(this).attr('action'),
+        type: $(this).attr('method'),
+        data: formdata,
+        processData: false,
+        contentType: false,
+        success: function(ret){
+            if (ret.error) {
+                $('#add-data-result').text("失敗: " + ret.message);
+            } else {
+                $('#add-data-result').text("新增 " + ret.added_record.county + ret.added_record.data_title + " 成功");
+                update_records(ret.records);
+            }
+        }
+    });
+});
 $('#add-data-form input[name="county"]').keyup(function(){
     var input = $(this).val();
     if (!input) {
@@ -119,7 +141,8 @@ $(function(){
     });
 });
 
-$.get('/update/list', function(api_records){
+
+update_records = function(api_records){
     records = api_records;
     for (var i = 0; i < records.length; i ++) {
         data = records[i].data;
@@ -146,7 +169,9 @@ $.get('/update/list', function(api_records){
     $('.count').each(function(){
         $(this).text($('#tbody tr.' + $(this).data('type')).length);
     });
-}, 'json');
+};
+
+$.get('/update/list', update_records, 'json');
 
 </script>
 <?= $this->partial('/common/footer.phtml', $this) ?>

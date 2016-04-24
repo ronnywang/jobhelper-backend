@@ -82,6 +82,15 @@ class UpdateController extends Pix_Controller
             'changed_by' => $this->view->user->user_name,
             'origin_data' => json_encode(array()),
         ));
-        return $this->json($dataset->toArray());
+
+        return $this->json(array(
+            'error' => false,
+            'added_record' => $record,
+            'records' => array_values(array_map(function($r) {
+                $r['data'] = json_decode($r['data']);
+                $r['data']->county = str_replace('台', '臺', $r['data']->county);
+                return $r;
+            }, DataSet::search(1)->toArray(array('id', 'data')))),
+        ));
     }
 }
