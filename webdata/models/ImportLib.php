@@ -2,6 +2,13 @@
 
 class ImportLib
 {
+    public function normalize_county($county)
+    {
+        $county = str_replace('台', '臺', $county);
+        $county = str_replace('桃園縣', '桃園市', $county);
+        return $county;
+    }
+
     public function get_csv_from_url($url)
     {
         if (preg_match('#https://github.com/([^/]*)/([^/]*)/blob/(.*)#', $url, $matches)) {

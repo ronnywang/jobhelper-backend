@@ -74,6 +74,7 @@ $('#add-data-form input[name="county"]').keyup(function(){
         return;
     }
     input = input.replace('台', '臺');
+    input = input.replace('桃園縣', '桃園市');
 
     counties = records.map(function(r) { return $.trim(r.data.county); });
     counties = counties.sort();

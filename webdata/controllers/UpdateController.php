@@ -21,7 +21,7 @@ class UpdateController extends Pix_Controller
         return $this->json(
             array_values(array_map(function($r) {
                 $r['data'] = json_decode($r['data']);
-                $r['data']->county = str_replace('台', '臺', $r['data']->county);
+                $r['data']->county = ImportLib::normalize_county($r['data']->county);
                 return $r;
             }, DataSet::search(1)->toArray(array('id', 'data'))))
         );
@@ -88,7 +88,7 @@ class UpdateController extends Pix_Controller
             'added_record' => $record,
             'records' => array_values(array_map(function($r) {
                 $r['data'] = json_decode($r['data']);
-                $r['data']->county = str_replace('台', '臺', $r['data']->county);
+                $r['data']->county = ImportLib::normalize_county($r['data']->county);
                 return $r;
             }, DataSet::search(1)->toArray(array('id', 'data')))),
         ));
