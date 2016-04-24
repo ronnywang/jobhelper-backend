@@ -4,6 +4,30 @@
 這邊是求職小幫手資料更新分工區域，詳細說明可參考 <a href="https://g0v.hackpad.com/-SOP-HvwTqmWua3p">https://g0v.hackpad.com/-SOP-HvwTqmWua3p</a>
 </p>
 
+<h1>資料檢查</h1>
+這邊可以檢查資料欄位是否符合需要:
+<form method="post" action="/update/checkurl" id="checkurl-form">
+    網址: <input type="text" name="url" placeholder="可以使用 GitHub CSV 網址或是 Google Spreadsheet 網址">
+    <button type="submit">檢查</button>
+    <p id="checkurl-result">檢查結果</p>
+</form>
+<script>
+$('#checkurl-form').submit(function(e){
+    e.preventDefault();
+    $('#checkurl-result').text('檢查中...');
+    $.get($(this).attr('action') + '?url=' + encodeURIComponent($('[name="url"]', this).val()), function(r){
+        if (r.error) {
+            $('#checkurl-result').text("錯誤: " + r.message);
+        } else {
+            if (r.records.length) {
+                $('#checkurl-result').text("成功，有 " + r.records.map(function(r) { return r['事業單位']; }).slice(0, 3).join(',') + ' 等 ' + r.records.length + ' 個事業單位資料');
+            } else {
+                $('#checkurl-result').text("錯誤，沒有抓到任何資料");
+            }
+        }
+    });
+});
+</script>
 <h1>更新確認手</h1>
 請至 <a href="https://docs.google.com/forms/d/1gMAQN3ugxr8bvJ59qYizDEqcmSzSqmOc9IaXU69nq4U/viewform">Google Form</a> 回報
 篩選條件：<select id="filter">
