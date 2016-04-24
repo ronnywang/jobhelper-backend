@@ -12,6 +12,12 @@
     <p id="checkurl-result">檢查結果</p>
 </form>
 <script>
+var get_unique = function(array) {
+    array = array.sort();
+    return array.filter(function(v, k) {
+        return (k == 0 || v != array[k - 1]);
+    });
+};
 $('#checkurl-form').submit(function(e){
     e.preventDefault();
     $('#checkurl-result').text('檢查中...');
@@ -28,8 +34,47 @@ $('#checkurl-form').submit(function(e){
     });
 });
 </script>
+
 <h1>更新確認手</h1>
+有新資料就來這邊登錄，讓後面可以接著截圖和資料整理
+<form method="post" action="/update/adddataset" id="add-data-form">
+    縣市或分類: <input type="text" name="county" class="group-input"><span id="county-hint"></span><br>
+    標題: <input type="text" name="title"><span id="title-hint"></span><br>
+    上架時間: <input type="text" name="published_at"><br>
+    網址: <input type="text" name="url"><br>
+    其他: <textarea name="other"></textarea>
+    <button type="submit">送出</button>
+</form>
+<script>
+$('#add-data-form input[name="county"]').keyup(function(){
+    var input = $(this).val();
+    if (!input) {
+        return;
+    }
+    input = input.replace('台', '臺');
+
+    counties = records.map(function(r) { return $.trim(r.data.county); });
+    counties = counties.sort();
+    var unique_county = get_unique(counties);
+    unique_county = unique_county.filter(function(c) { return c.indexOf(input) != -1; });
+    $('#county-hint').html(unique_county.map(function(c) { return $('<span></span>').append($('<span></span>').text(c).addClass('group')).html(); }).join(','));
+}).change(function(){
+
+    var county = $('#add-data-form input[name="county"]').val();
+    titles = records
+        .filter(function(r) { return r.data.county == county; })
+        .sort(function(a,b) { return b.data.published_at - a.data.published_at; })
+        .map(function(r) { return r.data.data_title})
+        .slice(0, 5);
+    $('#title-hint').text(county + "的標題記錄: " + titles.join(','));
+});
+
+
+</script>
+
 請至 <a href="https://docs.google.com/forms/d/1gMAQN3ugxr8bvJ59qYizDEqcmSzSqmOc9IaXU69nq4U/viewform">Google Form</a> 回報
+
+<h1>現有資料</h1>
 篩選條件：<select id="filter">
     <option value="all">全部</option>
     <option value="no-data">需要資料</option>
@@ -44,6 +89,7 @@ $('#checkurl-form').submit(function(e){
             <th>資料連結(<a href="#" class="count" data-type="no-data">0</a>)</th>
             <th>截圖連結(<a href="#" class="count" data-type="no-snapshot">0</a>)</th>
             <th>建立時間</th>
+            <th>上架時間</th>
         </tr>
     </thead>
     <tbody id="tbody">
@@ -66,12 +112,19 @@ $('.count').click(function(e){
     $('#filter').val($(this).data('type')).change();
 });
 
+$(function(){
+    $(document).on('click', '.group', function(e){
+        e.preventDefault();
+        $('.group-input').val($(this).text()).change();
+    });
+});
+
 $.get('/update/list', function(api_records){
     records = api_records;
     for (var i = 0; i < records.length; i ++) {
         data = records[i].data;
         tr_dom = $('<tr></tr>');
-        tr_dom.append($('<td></td>').text(data.county));
+        tr_dom.append($('<td></td>').text(data.county).addClass('group'));
         tr_dom.append($('<td></td>').text(data.data_title));
         tr_dom.append($('<td></td>').append($('<a></a>').attr('href', data.origin_url).text('連結')));
         if (data.data_url) {
@@ -87,6 +140,7 @@ $.get('/update/list', function(api_records){
             tr_dom.append($('<td></td>').text('無截圖'));
         }
         tr_dom.append($('<td></td>').text(new Date(1000 * data.created_at).toDateString()));
+        tr_dom.append($('<td></td>').text(new Date(1000 * data.published_at).toDateString()));
         $('#tbody').append(tr_dom);
     }
     $('.count').each(function(){
