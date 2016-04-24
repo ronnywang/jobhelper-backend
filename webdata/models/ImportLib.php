@@ -2,14 +2,14 @@
 
 class ImportLib
 {
-    public function normalize_county($county)
+    public static function normalize_county($county)
     {
         $county = str_replace('台', '臺', $county);
         $county = str_replace('桃園縣', '桃園市', $county);
         return $county;
     }
 
-    public function get_csv_from_url($url)
+    public static function get_csv_from_url($url)
     {
         if (preg_match('#https://github.com/([^/]*)/([^/]*)/blob/(.*)#', $url, $matches)) {
             $url = "https://raw.githubusercontent.com/{$matches[1]}/{$matches[2]}/{$matches[3]}";
@@ -26,7 +26,7 @@ class ImportLib
         return fopen($url, 'r');
     }
 
-    public function parse_column($column)
+    public static function parse_column($column)
     {
         switch ($column) {
         case '事業單位名稱':
@@ -94,7 +94,7 @@ class ImportLib
         throw new Exception("日期解析失敗: {$str}");
     }
 
-    public function get_records_from_url($url) 
+    public static function get_records_from_url($url) 
     {
         $fp = self::get_csv_from_url($url);
         $column_rows = array_map(function($s) { return preg_replace('#\s+#', '', $s); }, fgetcsv($fp));
