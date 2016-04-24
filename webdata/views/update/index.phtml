@@ -1,0 +1,74 @@
+<?= $this->partial('/common/header.phtml', $this) ?>
+<h1>求職小幫手</h1>
+<p class="lead">
+這邊是求職小幫手資料更新分工區域，詳細說明可參考 <a href="https://g0v.hackpad.com/-SOP-HvwTqmWua3p">https://g0v.hackpad.com/-SOP-HvwTqmWua3p</a>
+</p>
+
+<h1>更新確認手</h1>
+請至 <a href="https://docs.google.com/forms/d/1gMAQN3ugxr8bvJ59qYizDEqcmSzSqmOc9IaXU69nq4U/viewform">Google Form</a> 回報
+篩選條件：<select id="filter">
+    <option value="all">全部</option>
+    <option value="no-data">需要資料</option>
+    <option value="no-snapshot">需要截圖</option>
+</select>
+<table class="table">
+    <thead>
+        <tr>
+            <th>縣市</th>
+            <th>標題</th>
+            <th>原始連結</th>
+            <th>資料連結(<a href="#" class="count" data-type="no-data">0</a>)</th>
+            <th>截圖連結(<a href="#" class="count" data-type="no-snapshot">0</a>)</th>
+            <th>建立時間</th>
+        </tr>
+    </thead>
+    <tbody id="tbody">
+    </tbody>
+</table>
+<script>
+var records;
+$('#filter').change(function(){
+    var v = $(this).val();
+    if ('all' == v) {
+        $('#tbody tr').show();
+    } else {
+        $('#tbody tr').hide();
+        $('#tbody .' + v).show();
+    }
+    });
+
+$('.count').click(function(e){
+    e.preventDefault();
+    $('#filter').val($(this).data('type')).change();
+});
+
+$.get('/update/list', function(api_records){
+    records = api_records;
+    for (var i = 0; i < records.length; i ++) {
+        data = records[i].data;
+        tr_dom = $('<tr></tr>');
+        tr_dom.append($('<td></td>').text(data.county));
+        tr_dom.append($('<td></td>').text(data.data_title));
+        tr_dom.append($('<td></td>').append($('<a></a>').attr('href', data.origin_url).text('連結')));
+        if (data.data_url) {
+            tr_dom.append($('<td></td>').append($('<a></a>').attr('href', data.data_url).text('資料')));
+        } else {
+            tr_dom.addClass('no-data');
+            tr_dom.append($('<td></td>').text('無資料'));
+        }
+        if (data.snapshot_url) {
+            tr_dom.append($('<td></td>').append($('<a></a>').attr('href', data.snapshot_url).text('截圖')));
+        } else {
+            tr_dom.addClass('no-snapshot');
+            tr_dom.append($('<td></td>').text('無截圖'));
+        }
+        tr_dom.append($('<td></td>').text(new Date(1000 * data.created_at).toDateString()));
+        $('#tbody').append(tr_dom);
+    }
+    $('.count').each(function(){
+        $(this).text($('#tbody tr.' + $(this).data('type')).length);
+    });
+}, 'json');
+
+</script>
+<?= $this->partial('/common/footer.phtml', $this) ?>
