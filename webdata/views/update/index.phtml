@@ -86,7 +86,10 @@ $('#add-data-form input[name="county"]').keyup(function(){
     titles = records
         .filter(function(r) { return r.data.county == county; })
         .sort(function(a,b) { return b.data.published_at - a.data.published_at; })
-        .map(function(r) { return r.data.data_title})
+        .map(function(r) {
+            p = new Date(r.data.published_at * 1000);
+            return '(' + p.getFullYear() + '/' + (p.getMonth() + 1) + '/' + p.getDate() + ')' + r.data.data_title;
+        })
         .slice(0, 5);
     $('#title-hint').text(county + "的標題記錄: " + titles.join(','));
 });
