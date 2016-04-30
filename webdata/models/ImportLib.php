@@ -28,7 +28,7 @@ class ImportLib
 
     public static function parse_column($column)
     {
-        switch ($column) {
+        switch (str_replace(' ', '', $column)) {
         case '事業單位名稱':
         case '事業單位':
         case '公司名稱':
@@ -47,6 +47,7 @@ class ImportLib
         case '違反法條':
         case '違法條款':
         case '違反勞動基準法條款':
+        case '違反法令條':
             return '違反條款';
 
         case '違反法規內容':
