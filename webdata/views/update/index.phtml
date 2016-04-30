@@ -39,10 +39,18 @@ $('#checkurl-form').submit(function(e){
 有新資料就來這邊登錄，讓後面可以接著截圖和資料整理
 <form method="post" action="/update/adddataset" id="add-data-form">
     <input type="hidden" name="sToken" value="<?= $this->sToken ?>">
+    <label>
+        <input type="radio" name="type" value="add">新增
+    </label>
+    <label>
+        <input type="radio" name="type" value="modify">修改，ID: <input type="text" name="modify_id">
+    </label>
     縣市或分類: <input type="text" name="county" class="group-input"><span id="county-hint"></span><br>
     標題: <input type="text" name="title"><span id="title-hint"></span><br>
     上架時間: <input type="text" name="published_at"><br>
-    網址: <input type="text" name="url"><br>
+    原始網址: <input type="text" name="origin_url"><br>
+    資料網址: <input type="text" name="data_url" placeholder="可空白，留給資料上傳手輸入"><br>
+    截圖網址: <input type="text" name="snapshot_url" placeholder="可空白，留給截圖手輸入"><br>
     其他: <textarea name="other"></textarea>
     <button type="submit">送出</button>
     <div id="add-data-result"></div>
@@ -62,7 +70,7 @@ $('#add-data-form').submit(function(e){
             if (ret.error) {
                 $('#add-data-result').text("失敗: " + ret.message);
             } else {
-                $('#add-data-result').text("新增 " + ret.added_record.county + ret.added_record.data_title + " 成功");
+                $('#add-data-result').text(ret.message);
                 update_records(ret.records);
             }
         }
@@ -93,7 +101,7 @@ $('#add-data-form input[name="county"]').keyup(function(){
             var p = new Date(r.data.published_at * 1000);
             span_dom.text('(' + p.getFullYear() + '/' + (p.getMonth() + 1) + '/' + p.getDate() + ')');
             span_dom.append($('<a></a>').text(r.data.data_title));
-            span_dom.data('record', r.data);
+            span_dom.data('record', r);
             span_dom.addClass('title-record');
             return span_dom;
         })
@@ -102,21 +110,27 @@ $('#add-data-form input[name="county"]').keyup(function(){
         });
         });
 
-$('#title-hint').on('click', '.title-record', function(e){
-    e.preventDefault();
-    var record = $(this).data('record');
+var fill_record = function(record){
     $('#add-data-form input[name="county"]').val(record.county);
     $('#add-data-form input[name="title"]').val(record.data_title);
     p = new Date(record.published_at * 1000);
     $('#add-data-form input[name="published_at"]').val(p.getFullYear() + '/' + (p.getMonth() + 1) + '/' + p.getDate());
-    $('#add-data-form input[name="url"]').val(record.url);
+    $('#add-data-form input[name="origin_url"]').val(record.origin_url);
     $('#add-data-form input[name="other"]').val(record.other);
+    $('#add-data-form input[name="data_url"]').val(record.data_url);
+    $('#add-data-form input[name="snapshot_url"]').val(record.snapshot_url);
+};
+
+$('#title-hint').on('click', '.title-record', function(e){
+    e.preventDefault();
+    var record = $(this).data('record');
+    $('#add-data-form input[name="type"][value="add"]').prop('checked', true);
+    $('#add-data-form input[name="modify_id"]').val(record.id);
+    fill_record(record.data);
 });
 
 
 </script>
-
-請至 <a href="https://docs.google.com/forms/d/1gMAQN3ugxr8bvJ59qYizDEqcmSzSqmOc9IaXU69nq4U/viewform">Google Form</a> 回報
 
 <h1>現有資料</h1>
 篩選條件：<select id="filter">
@@ -127,6 +141,7 @@ $('#title-hint').on('click', '.title-record', function(e){
 <table class="table">
     <thead>
         <tr>
+            <th>ID</th>
             <th>縣市</th>
             <th>標題</th>
             <th>原始連結</th>
@@ -163,12 +178,23 @@ $(function(){
     });
 });
 
+$('#tbody').on('click', '.tbody-id', function(e){
+    e.preventDefault();
+
+    var tr_dom = $(this).parents('tr');
+    var record = tr_dom.data('record');
+    $('#add-data-form input[name="type"][value="modify"]').prop('checked', true);
+    $('#add-data-form input[name="modify_id"]').val(record.id);
+    fill_record(record.data);
+});
 
 update_records = function(api_records){
     records = api_records;
     for (var i = 0; i < records.length; i ++) {
         data = records[i].data;
         tr_dom = $('<tr></tr>');
+        tr_dom.data('record', records[i]);
+        tr_dom.append($('<td></td>').append($('<a></a>').attr('href', '#').addClass('tbody-id').text(records[i].id)));
         tr_dom.append($('<td></td>').text(data.county).addClass('group'));
         tr_dom.append($('<td></td>').text(data.data_title));
         tr_dom.append($('<td></td>').append($('<a></a>').attr('href', data.origin_url).text('連結')));
