@@ -63,7 +63,9 @@ class UpdateController extends Pix_Controller
         }
         $record->county = trim($_POST['county']);
         $record->data_title = trim($_POST['title']);
-        if (!$record->published_at = strtotime(trim($_POST['published_at']))) {
+        if (intval($_POST['published_at']) == 0) {
+            $record->published_at = 0;
+        } elseif (!$record->published_at = strtotime(trim($_POST['published_at']))) {
             return $this->json_error("上架時間不正確");
         }
         $record->origin_url = trim($_POST['origin_url']);
