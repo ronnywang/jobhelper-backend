@@ -134,6 +134,9 @@ class ImportLib
             if (!$data->{'處分日期'}) {
                 throw new Exception("Line {$line_no} 找不到 處分日期");
             }
+            if (!$data->{'處分字號'}) {
+                throw new Exception("Line {$line_no} 找不到 處分字號");
+            }
             $records[] = $data;
         }
 
