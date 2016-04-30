@@ -189,6 +189,7 @@ $('#tbody').on('click', '.tbody-id', function(e){
 });
 
 update_records = function(api_records){
+    $('#tbody').html('');
     records = api_records;
     for (var i = 0; i < records.length; i ++) {
         data = records[i].data;
