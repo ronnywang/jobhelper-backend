@@ -39,11 +39,14 @@ class ImportLib
         case '事業單位名稱(負責人姓名)':
         case '事業單位或事業主':
         case '事業單位名稱（負責人姓名）':
+        case '事業單位名稱/自然人姓名':
             return '事業單位';
 
         case '違反法令條款':
         case '違反條款':
+        case '違反法條':
         case '違法條款':
+        case '違反勞動基準法條款':
             return '違反條款';
 
         case '違反法規內容':
