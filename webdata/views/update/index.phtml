@@ -14,6 +14,7 @@
         <thead>
             <th>事業單位</th>
             <th>違反條款</th>
+            <th>違反法規內容</th>
             <th>處分字號</th>
             <th>處分日期</th>
         </thead>
@@ -41,6 +42,7 @@ $('#checkurl-form').submit(function(e){
                     var tr_dom = $('<tr></tr>');
                     tr_dom.append($('<td></td>').text(r['事業單位']));
                     tr_dom.append($('<td></td>').text(r['違反條款']));
+                    tr_dom.append($('<td></td>').text(r['違反法規內容']));
                     tr_dom.append($('<td></td>').text(r['處分字號']));
                     tr_dom.append($('<td></td>').text(r['處分日期']));
                     $('#checkurl-tbody').append(tr_dom);
