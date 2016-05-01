@@ -39,6 +39,23 @@ class PackageRow extends Pix_Table_Row
         $this->updateToSearch();
     }
 
+    public function getRecords()
+    {
+        $content = $this->content->content;
+        if ($content[0] == '[') {
+            return json_decode($content);
+        }
+
+        $records = array();
+        foreach (explode("\n", trim($content)) as $id => $line) {
+            if ($line == '') {
+                continue;
+            }
+            $records[] = str_getcsv($line);
+        }
+        return $records;
+    }
+
     public function getEAVs()
     {
         return EAV::search(array('table' => 'Package', 'id' => $this->package_id));
@@ -56,11 +73,7 @@ class PackageRow extends Pix_Table_Row
 
         $requests = array();
 
-        $content = $this->content->content;
-        foreach (explode("\n", trim($content)) as $id => $line) {
-            if ($line == '') {
-                continue;
-            }
+        foreach ($this->getRecords() as $id => $rows) {
             $id_info = new STdClass;
             $id_info->index = new StdClass;
             $id_info->index->_index = 'jobhelper';
@@ -68,7 +81,6 @@ class PackageRow extends Pix_Table_Row
             $id_info->index->_id = $this->package_id . '-' . $id;
             $requests[] = json_encode($id_info);
 
-            $rows = str_getcsv($line);
             $row = new StdClass;
             $row->package_id = $this->package_id;
             $row->name = $rows[0];

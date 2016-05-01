@@ -22,7 +22,7 @@ $this->title = $this->package->name;
         </tr>
     </thead>
     <tbody>
-    <?php foreach (explode("\n", trim($this->package->content->content)) as $line) { $rows = str_getcsv($line); ?>
+    <?php foreach ($this->package->getRecords() as $rows) { ?>
     <tr>
         <td><a name="company-<?= $this->escape($rows[0] . '-' . $rows[1]) ?>"><?= $this->escape($rows[0]) ?></a></td>
         <td><?= $this->escape($rows[1]) ?></td>
