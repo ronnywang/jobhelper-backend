@@ -39,6 +39,7 @@ class ImportLib
         case '事業單位名稱(負責人姓名)':
         case '事業單位或事業主':
         case '事業單位名稱（負責人姓名）':
+        case '事業單位名稱、負責人(地址)':
         case '事業單位名稱/自然人姓名':
             return '事業單位';
 
@@ -55,15 +56,19 @@ class ImportLib
 
         case '處分字號':
         case '處分書文號':
+        case '處分文號':
+        case '罰鍰文號':
         case '處分文書號':
         case '發文字號':
         case '文號':
         case '處分書日期文號':
+        case '裁處書與執行命令文號':
             return '處分字號';
 
         case '處分日期':
         case '處分書日期':
         case '處份日期':
+        case '裁處書日期':
         case '罰鍰日期':
         case '日期':
             return '處分日期';
@@ -78,6 +83,7 @@ class ImportLib
 
     public static function parse_date($str)
     {
+        $str = str_replace(' ', '', $str);
         if (preg_match_all('#(\d*)年(\d*)月(\d*)(日|號)#', $str, $matches)) {
             $last_id = count($matches[0]) - 1;
             return (1911 + $matches[1][$last_id] ) . '/' . $matches[2][$last_id] . '/' . $matches[3][$last_id];
