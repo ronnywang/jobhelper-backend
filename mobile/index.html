@@ -135,7 +135,7 @@ var load_pkg_list=function(){
 	$(this).attr('disabled','');
 	$.ajax({
 		type:'GET',
-		url:'http://jobhelper.g0v.ronny.tw/api/getpackages',
+		url:'//jobhelper.g0v.ronny.tw/api/getpackages',
 		dataType:'JSONP',
 		timeout:5000,
 		success:function(data){
@@ -230,7 +230,7 @@ $(document).ready(function(){
 
 		$.ajax({
 			type:'GET',
-			url:'http://jobhelper.g0v.ronny.tw/api/search?name='+comp_name+'&packages='+pkg_list,
+			url:'//jobhelper.g0v.ronny.tw/api/search?name='+comp_name+'&packages='+pkg_list,
 			dataType:'JSONP',
 			timeout:5000,
 			success:function(data){
