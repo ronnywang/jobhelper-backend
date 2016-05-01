@@ -2,6 +2,43 @@
 
 class PackageRow extends Pix_Table_Row
 {
+    public function updateContent($content, $updated_at = null)
+    {
+        // 檢查 content
+        foreach (explode("\n", trim($content)) as $no => $line) {
+            $no = $no + 1;
+            $terms = str_getcsv($line);
+
+            if (count($terms) < 5) {
+                throw new Exception("每一行至少要有 5 列，第 {$no} 行只有 " . count($terms));
+            }
+
+            if (false === strtotime($terms[1])) {
+                throw new Exception("第 {$no} 行是無法判別的日期格式: " . $terms[1]);
+            }
+
+            if (!filter_var($terms[3], FILTER_VALIDATE_URL)) {
+                throw new Exception("第四列是必需是原始連結，第 {$no} 行的連結不是正確的網址格式");
+            }
+        }
+
+        try {
+            $this->create_content(array(
+                'content' => $content,
+            ));
+        } catch (Pix_Table_DuplicateException $e) {
+            $this->content->update(array(
+                'content' => $content,
+            ));
+        }
+
+        if (is_null($updated_at)) {
+            $updated_at = time();
+        }
+        $this->update(array('package_time' => $updated_at));
+        $this->updateToSearch();
+    }
+
     public function getEAVs()
     {
         return EAV::search(array('table' => 'Package', 'id' => $this->package_id));
