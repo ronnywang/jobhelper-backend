@@ -49,6 +49,7 @@ class ImportLib
         case '違法條款':
         case '違反勞動基準法條款':
         case '違反法令條':
+        case '法規條款':
             return '違反條款';
 
         case '違反法規內容':
