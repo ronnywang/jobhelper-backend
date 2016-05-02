@@ -55,7 +55,7 @@ foreach (Package::search(1) as $package) {
                 $dataset->snapshot_url,
                 $dataset->data_title,
             );
-            $sig = md5(implode('', array_slice($outputs, 0, 3)));
+            $sig = md5(preg_replace("#\s*#", '', implode('', array_slice($outputs, 0, 3))));
             if (array_key_exists($sig, $showed)) {
                 continue;
             }
