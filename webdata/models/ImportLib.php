@@ -141,6 +141,10 @@ class ImportLib
             if (!$data->{'事業單位'}) {
                 throw new Exception("Line {$line_no} 找不到 事業單位");
             }
+            // # 開頭就表示已被取消
+            if (strpos($data->{'事業單位'}, '#') === 0) {
+                continue;
+            }
             if (!$data->{'處分日期'}) {
                 throw new Exception("Line {$line_no} 找不到 處分日期");
             }
