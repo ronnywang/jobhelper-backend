@@ -154,6 +154,7 @@ class ImportLib
             }
             $records[] = $data;
         }
+        fclose($fp);
 
         return $records;
     }
