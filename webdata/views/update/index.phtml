@@ -159,6 +159,8 @@ $('#title-hint').on('click', '.title-record', function(e){
     <option value="no-data">需要資料</option>
     <option value="no-snapshot">需要截圖</option>
 </select>
+篩選縣市：<select id="filter-county">
+</select>
 <table class="table">
     <thead>
         <tr>
@@ -187,6 +189,22 @@ $('#filter').change(function(){
     }
     });
 
+$('#filter-county').change(function(){
+    var v = $(this).val();
+    $('#tbody tr').show();
+    if ('all' == v) {
+        return;
+    }
+
+    $('#tbody tr').each(function(){
+        if ($(this).data('record').data.county != v) {
+            $(this).hide();
+        }
+    });
+});
+
+
+
 $('.count').click(function(e){
     e.preventDefault();
     $('#filter').val($(this).data('type')).change();
@@ -212,12 +230,15 @@ $('#tbody').on('click', '.tbody-id', function(e){
 update_records = function(api_records){
     $('#tbody').html('');
     records = api_records;
+    records = records.sort(function(a, b) { return b.data.published_at - a.data.published_at; });
+    var counties = {};
     for (var i = 0; i < records.length; i ++) {
         data = records[i].data;
         tr_dom = $('<tr></tr>');
         tr_dom.data('record', records[i]);
         tr_dom.append($('<td></td>').append($('<a></a>').attr('href', '#').addClass('tbody-id').text(records[i].id)));
         tr_dom.append($('<td></td>').text(data.county).addClass('group'));
+        counties[data.county] = true;
         tr_dom.append($('<td></td>').text(data.data_title));
         tr_dom.append($('<td></td>').append($('<a></a>').attr('href', data.origin_url).text('連結')));
         if (data.data_url) {
@@ -235,6 +256,11 @@ update_records = function(api_records){
         tr_dom.append($('<td></td>').text(new Date(1000 * data.created_at).toDateString()));
         tr_dom.append($('<td></td>').text(new Date(1000 * data.published_at).toDateString()));
         $('#tbody').append(tr_dom);
+    }
+    $('#filter-county').html('');
+    $('#filter-county').append($('<option></option>').text('全部').attr('value', 'all'));
+    for (var c in counties) {
+        $('#filter-county').append($('<option></option>').text(c).attr('value', c));
     }
     $('.count').each(function(){
         $(this).text($('#tbody tr.' + $(this).data('type')).length);
