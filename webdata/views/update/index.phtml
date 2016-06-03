@@ -81,6 +81,7 @@ $('#add-data-form').submit(function(e){
     e.preventDefault();
     var formdata = new FormData(this);
 
+    $('#add-data-result').text('處理中');
     $.ajax({
         url: $(this).attr('action'),
         type: $(this).attr('method'),
