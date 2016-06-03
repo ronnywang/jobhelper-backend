@@ -137,7 +137,7 @@ var fill_record = function(record){
     p = new Date(record.published_at * 1000);
     $('#add-data-form input[name="published_at"]').val(p.getFullYear() + '/' + (p.getMonth() + 1) + '/' + p.getDate());
     $('#add-data-form input[name="origin_url"]').val(record.origin_url);
-    $('#add-data-form input[name="other"]').val(record.other);
+    $('#add-data-form [name="other"]').val(record.other);
     $('#add-data-form input[name="data_url"]').val(record.data_url);
     $('#add-data-form input[name="snapshot_url"]').val(record.snapshot_url);
 };
