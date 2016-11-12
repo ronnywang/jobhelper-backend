@@ -138,6 +138,7 @@ class ApiController extends Pix_Controller
         $content = curl_exec($curl);
         $info = curl_getinfo($curl);
         if ($info['http_code'] != 200) {
+            header('HTTP/1.1 ' . $info['http_code']);
             return $this->jsonp(array('error' => true, 'message' => '搜尋出問題'), $_GET['callback']);
         }
         $search_result = json_decode($content);
