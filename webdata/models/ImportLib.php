@@ -9,13 +9,19 @@ class ImportLib
         return $county;
     }
 
-    public static function get_csv_from_url($url)
+    public static function get_csv_from_url($url, $with_cache = false, $force_reload = false)
     {
+        if (!file_exists('cache')) {
+            mkdir('cache');
+        }
+
+        $origin_url = $url;
+
         if (preg_match('#https://github.com/([^/]*)/([^/]*)/blob/(.*)#', $url, $matches)) {
             $url = "https://raw.githubusercontent.com/{$matches[1]}/{$matches[2]}/{$matches[3]}";
-        } elseif (preg_match('#https://docs.google.com/spreadsheets/d/([^/]*)/edit[\#?]gid=([0-9]*)#', $url, $matches)) {
-            $url = "https://docs.google.com/spreadsheets/d/{$matches[1]}/export?gid={$matches[2]}&format=csv";
-        } elseif (preg_match('#https://docs.google.com/spreadsheets/d/([^/]*)/edit#', $url, $matches)) {
+        } elseif (preg_match('#https://docs.google.com/spreadsheets/d/([^/]*)/edit(\?[^\#]*)?\#gid=([0-9]*)#', $url, $matches)) {
+            $url = "https://docs.google.com/spreadsheets/d/{$matches[1]}/export?gid={$matches[3]}&format=csv";
+        } elseif (preg_match('#https://docs.google.com/spreadsheets/d/([^/]*)/edit\?usp=sharing$#', $url, $matches)) {
             $url = "https://docs.google.com/spreadsheets/d/{$matches[1]}/export?format=csv";
         } elseif (preg_match('#https://sheethub.com#', $url)) {
             $url = $url . '?format=csv';
@@ -23,7 +29,12 @@ class ImportLib
             throw new Exception("unknown url: $url");
         }
 
-        return fopen($url, 'r');
+        if (!$force_reload and file_exists('cache/' . md5($url))) {
+            return fopen('cache/' . md5($url), 'r');
+        }
+
+        file_put_contents('cache/' . md5($url), file_get_contents($url));
+        return fopen('cache/' . md5($url), 'r');
     }
 
     public static function parse_column($column)
@@ -88,6 +99,7 @@ class ImportLib
     public static function parse_date($str)
     {
         $str = str_replace(' ', '', $str);
+        $str = str_replace('、', '/', $str);
         if (preg_match_all('#(\d*)年(\d*)月(\d*)(日|號)#', $str, $matches)) {
             $last_id = count($matches[0]) - 1;
             return (1911 + $matches[1][$last_id] ) . '/' . $matches[2][$last_id] . '/' . $matches[3][$last_id];
@@ -108,11 +120,10 @@ class ImportLib
         throw new Exception("日期解析失敗: {$str}");
     }
 
-    public static function get_records_from_url($url) 
+    public static function get_records_from_url($url, $with_cache = false) 
     {
-        $fp = self::get_csv_from_url($url);
+        $fp = self::get_csv_from_url($url, $with_cache);
         $column_rows = array_map(function($s) { return preg_replace('#\s+#', '', $s); }, fgetcsv($fp));
-
         $records = array();
         $line_no = 1;
         while ($rows = fgetcsv($fp)) {
