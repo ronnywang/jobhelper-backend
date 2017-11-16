@@ -83,7 +83,7 @@ class PackageRow extends Pix_Table_Row
     {
         // 先刪舊資料
         $curl = curl_init();
-        $url = getenv('SEARCH_URL') . '/jobhelper/packages/_query?q=package_id:' . $this->package_id;
+        $url = getenv('SEARCH_URL') . '/packages/_query?q=package_id:' . $this->package_id;
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'DELETE');
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
@@ -94,7 +94,6 @@ class PackageRow extends Pix_Table_Row
         foreach ($this->getRecords() as $id => $rows) {
             $id_info = new STdClass;
             $id_info->index = new StdClass;
-            $id_info->index->_index = 'jobhelper';
             $id_info->index->_type = 'packages';
             $id_info->index->_id = $this->package_id . '-' . $id;
             $requests[] = json_encode($id_info);
@@ -111,7 +110,7 @@ class PackageRow extends Pix_Table_Row
 
         if (count($requests)) {
             $curl = curl_init();
-            $url = getenv('SEARCH_URL') . '/jobhelper/_bulk?refresh=true';
+            $url = getenv('SEARCH_URL') . '/_bulk?refresh=true';
             curl_setopt($curl, CURLOPT_URL, $url);
             curl_setopt($curl, CURLOPT_HEADER, 0);
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);

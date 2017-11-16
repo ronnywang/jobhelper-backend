@@ -129,7 +129,7 @@ class ApiController extends Pix_Controller
             return $this->jsonp($result, $_GET['callback']);
         }
 
-        $url = getenv('SEARCH_URL') . '/jobhelper/_search?q=' . $q . '&size=200';
+        $url = getenv('SEARCH_URL') . '/_search?q=' . $q . '&size=200';
 
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);
