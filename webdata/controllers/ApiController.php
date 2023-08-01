@@ -129,19 +129,12 @@ class ApiController extends Pix_Controller
             return $this->jsonp($result, $_GET['callback']);
         }
 
-        $url = getenv('SEARCH_URL') . '/_search?q=' . $q . '&size=200';
-
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_TIMEOUT, 10);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        $content = curl_exec($curl);
-        $info = curl_getinfo($curl);
-        if ($info['http_code'] != 200) {
+        try {
+            $search_result = Elastic::dbQuery("/_search?q={$q}&size=200");
+        } catch (Exception $e) {
             header('HTTP/1.1 ' . $info['http_code']);
             return $this->jsonp(array('error' => true, 'message' => '搜尋出問題'), $_GET['callback']);
         }
-        $search_result = json_decode($content);
         $result = array('error' => false, 'data' => array());
         $result['query'] = urldecode($q);
         $data = array();
